@@ -1,7 +1,7 @@
 export const neuronika = {
   title: "Neuronika — AI-Powered Knowledge Management Tool",
   date: "2024",
-  fields: ["AI Engineering", "Full Stack Development"],
+  fields: ["Full Stack Development"],
   links: {
     github: "https://github.com/Capataina/Neuronika",
   },

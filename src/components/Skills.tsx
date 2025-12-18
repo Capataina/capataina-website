@@ -1,25 +1,17 @@
 import { Accordion } from "@/components/ui/accordion";
 import { Skill } from "./Skill";
-import { rust } from "@/skills/rust";
-import { cpp } from "@/skills/cpp";
-import { python } from "@/skills/python";
-import { pytorch } from "@/skills/pytorch";
-import { tensorflow } from "@/skills/tensorflow";
-import { neuroevolution } from "@/skills/neuroevolution";
-import { mlFrameworks } from "@/skills/ml-frameworks";
-import { react } from "@/skills/react";
-import { nextjs } from "@/skills/nextjs";
-import { tauri } from "@/skills/tauri";
-import { typescript } from "@/skills/typescript";
-import { networking } from "@/skills/networking";
-import { linux } from "@/skills/linux";
-import { sqlite } from "@/skills/sqlite";
-import { dataScience } from "@/skills/data-science";
-import { compilerDesign } from "@/skills/compiler-design";
-import { llms } from "@/skills/llms";
-import { mathematics } from "@/skills/mathematics";
-import { gameDev } from "@/skills/game-dev";
-import { cybersecurity } from "@/skills/cybersecurity";
+import { machineLearning } from "@/skills/machine-learning";
+import { webDevelopment } from "@/skills/web-development";
+import { desktopDevelopment } from "@/skills/desktop-development";
+import { systemsProgramming } from "@/skills/systems-programming";
+import { networkingProtocols } from "@/skills/networking-protocols";
+import { dataEngineering } from "@/skills/data-engineering";
+import { compilerGPU } from "@/skills/compiler-gpu";
+import { largeLanguageModels } from "@/skills/large-language-models";
+import { linuxDevOps } from "@/skills/linux-devops";
+import { cybersecurityNetworking } from "@/skills/cybersecurity-networking";
+import { mathematicsOptimization } from "@/skills/mathematics-optimization";
+import { gameDevelopment } from "@/skills/game-development";
 
 interface SkillsProps {
   field: string;
@@ -27,26 +19,18 @@ interface SkillsProps {
 
 export function Skills({ field }: SkillsProps) {
   const allSkills = [
-    rust,
-    cpp,
-    python,
-    pytorch,
-    tensorflow,
-    neuroevolution,
-    mlFrameworks,
-    react,
-    nextjs,
-    tauri,
-    typescript,
-    networking,
-    linux,
-    sqlite,
-    dataScience,
-    compilerDesign,
-    llms,
-    mathematics,
-    gameDev,
-    cybersecurity,
+    machineLearning,
+    webDevelopment,
+    desktopDevelopment,
+    systemsProgramming,
+    networkingProtocols,
+    dataEngineering,
+    compilerGPU,
+    largeLanguageModels,
+    linuxDevOps,
+    cybersecurityNetworking,
+    mathematicsOptimization,
+    gameDevelopment,
   ];
 
   // Filter skills based on the field
