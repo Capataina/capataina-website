@@ -48,7 +48,7 @@ export function PortfolioCard({
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
 
   const defaultDescription =
-    "I am currently most actively developing Pinterest Style Image Browser. If you want to find out more about my projects, hover over them or click on the quadrants to explore!";
+    "I am currently most actively developing Pinterest Style Image Browser. If you want to find out more about my projects, hover over them, click on them or click on the quadrants to explore!";
   const displayedDescription =
     hoveredProject !== null
       ? highlightedProjects[hoveredProject].description
