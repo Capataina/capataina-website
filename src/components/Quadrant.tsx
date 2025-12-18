@@ -41,6 +41,85 @@ export function Quadrant({
 
   const Icon = labelIconMap[label];
 
+  // Memoize animation variants and transitions
+  const quadrantTransition = useMemo(
+    () => ({
+      type: "spring" as const,
+      stiffness: 500,
+      damping: 25,
+    }),
+    []
+  );
+
+  const iconInitialVariants = useMemo(
+    () => ({
+      scale: 0,
+      opacity: 0,
+      rotate: -180,
+    }),
+    []
+  );
+
+  const iconAnimateVariants = useMemo(
+    () => ({
+      scale: 1,
+      opacity: 1,
+      rotate: 0,
+    }),
+    []
+  );
+
+  const iconExitVariants = useMemo(
+    () => ({
+      scale: 0,
+      opacity: 0,
+      rotate: 180,
+    }),
+    []
+  );
+
+  const iconTransition = useMemo(
+    () => ({
+      type: "spring" as const,
+      stiffness: 350,
+      damping: 20,
+      duration: 0.3,
+    }),
+    []
+  );
+
+  const labelInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0.9,
+    }),
+    []
+  );
+
+  const labelAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      scale: 1,
+    }),
+    []
+  );
+
+  const labelExitVariants = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0.9,
+    }),
+    []
+  );
+
+  const labelTransition = useMemo(
+    () => ({
+      duration: 0.2,
+      ease: "easeInOut" as const,
+    }),
+    []
+  );
+
   // Throttle mouse movement to ~30fps (32ms) for performance
   const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
     const now = Date.now();
@@ -127,7 +206,7 @@ export function Quadrant({
             ? "0 4px 16px -2px rgba(0, 0, 0, 0.4)"
             : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
       }}
-      transition={{ type: "spring", stiffness: 500, damping: 25 }}
+      transition={quadrantTransition}
       onMouseMove={!isSelected ? handleMouseMove : undefined}
       onMouseEnter={() => !isSelected && onHoverChange(position)}
       onMouseLeave={() => !isSelected && onHoverChange(null)}
@@ -147,15 +226,10 @@ export function Quadrant({
         ) : shouldShowIcon && Icon ? (
           <motion.div
             key="icon"
-            initial={{ scale: 0, opacity: 0, rotate: -180 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0, opacity: 0, rotate: 180 }}
-            transition={{
-              type: "spring",
-              stiffness: 350,
-              damping: 20,
-              duration: 0.3,
-            }}
+            initial={iconInitialVariants}
+            animate={iconAnimateVariants}
+            exit={iconExitVariants}
+            transition={iconTransition}
           >
             <Icon
               className="w-10 h-10"
@@ -183,10 +257,10 @@ export function Quadrant({
         ) : (
           <motion.h2
             key="label"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
+            initial={labelInitialVariants}
+            animate={labelAnimateVariants}
+            exit={labelExitVariants}
+            transition={labelTransition}
             className="text-2xl font-bold text-gradient-purple"
           >
             {label}

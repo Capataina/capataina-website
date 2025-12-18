@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { Github, Linkedin, Download } from "lucide-react";
 import { Cpu, Brain, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface HighlightedProject {
   title: string;
@@ -54,6 +54,192 @@ export function PortfolioCard({
       ? highlightedProjects[hoveredProject].description
       : defaultDescription;
 
+  // Memoize animation variants and transitions
+  const cardFloatAnimation = useMemo(
+    () => ({
+      y: [0, -8, 0],
+    }),
+    []
+  );
+
+  const cardFloatTransition = useMemo(
+    () => ({
+      y: {
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut" as const,
+      },
+      layout: { duration: 0.2, ease: "easeOut" as const },
+    }),
+    []
+  );
+
+  const headerInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      y: -10,
+    }),
+    []
+  );
+
+  const headerAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      y: 0,
+    }),
+    []
+  );
+
+  const socialInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0,
+    }),
+    []
+  );
+
+  const socialAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      scale: 1,
+    }),
+    []
+  );
+
+  const githubHoverVariants = useMemo(
+    () => ({
+      scale: 1.15,
+      rotate: 5,
+    }),
+    []
+  );
+
+  const linkedinHoverVariants = useMemo(
+    () => ({
+      scale: 1.15,
+      rotate: -5,
+    }),
+    []
+  );
+
+  const buttonTapVariants = useMemo(
+    () => ({
+      scale: 0.95,
+    }),
+    []
+  );
+
+  const buttonTransition = useMemo(
+    () => ({
+      duration: 0.2,
+    }),
+    []
+  );
+
+  const titleInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      y: -10,
+    }),
+    []
+  );
+
+  const cvButtonInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      x: 20,
+    }),
+    []
+  );
+
+  const cvButtonAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      x: 0,
+    }),
+    []
+  );
+
+  const cvButtonHoverVariants = useMemo(
+    () => ({
+      scale: 1.05,
+      boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)",
+    }),
+    []
+  );
+
+  const projectsInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      y: 10,
+    }),
+    []
+  );
+
+  const projectsAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      y: 0,
+    }),
+    []
+  );
+
+  const projectLinkInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      scale: 0,
+    }),
+    []
+  );
+
+  const projectLinkAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      scale: 1,
+    }),
+    []
+  );
+
+  const projectLinkHoverVariants = useMemo(
+    () => ({
+      scale: 1.1,
+      y: -4,
+      boxShadow: "0 8px 16px rgba(99, 102, 241, 0.3)",
+    }),
+    []
+  );
+
+  const descriptionInitialVariants = useMemo(
+    () => ({
+      opacity: 0,
+      y: 10,
+    }),
+    []
+  );
+
+  const descriptionAnimateVariants = useMemo(
+    () => ({
+      opacity: 1,
+      y: 0,
+    }),
+    []
+  );
+
+  const descriptionExitVariants = useMemo(
+    () => ({
+      opacity: 0,
+      y: -10,
+    }),
+    []
+  );
+
+  const descriptionTransition = useMemo(
+    () => ({
+      duration: 0.15,
+    }),
+    []
+  );
+
   // Calculate offset based on hovered quadrant (move in opposite direction)
   const getOffset = () => {
     const offset = "2.5%"; // 2.5% movement
@@ -91,30 +277,21 @@ export function PortfolioCard({
       <motion.div
         layout="size"
         className="bg-black/15 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl w-[600px]"
-        animate={{
-          y: [0, -8, 0],
-        }}
-        transition={{
-          y: {
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          },
-          layout: { duration: 0.2, ease: "easeOut" },
-        }}
+        animate={cardFloatAnimation}
+        transition={cardFloatTransition}
       >
         <motion.div className="p-4 space-y-3">
           {/* Header Row */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={headerInitialVariants}
+            animate={headerAnimateVariants}
             transition={{ delay: 0.05, duration: 0.2 }}
             className="flex items-center justify-between gap-3"
           >
             {/* Social Links - Left */}
             <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={socialInitialVariants}
+              animate={socialAnimateVariants}
               transition={{ delay: 0.1, duration: 0.2 }}
               className="flex items-center gap-2"
             >
@@ -122,9 +299,9 @@ export function PortfolioCard({
                 href="https://github.com/Capataina"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.15, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+                whileHover={githubHoverVariants}
+                whileTap={buttonTapVariants}
+                transition={buttonTransition}
                 className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/20 transition-all duration-200"
               >
                 <Github className="w-4 h-4" />
@@ -133,9 +310,9 @@ export function PortfolioCard({
                 href="https://www.linkedin.com/in/atacanercetinkaya/"
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.15, rotate: -5 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
+                whileHover={linkedinHoverVariants}
+                whileTap={buttonTapVariants}
+                transition={buttonTransition}
                 className="p-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 rounded-lg border border-blue-400/30 transition-all duration-200"
               >
                 <Linkedin className="w-4 h-4" />
@@ -144,8 +321,8 @@ export function PortfolioCard({
 
             {/* Title - Center */}
             <motion.h1
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={titleInitialVariants}
+              animate={headerAnimateVariants}
               transition={{ delay: 0.08, duration: 0.2 }}
               className="text-xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent whitespace-nowrap absolute left-1/2 -translate-x-1/2"
             >
@@ -156,14 +333,11 @@ export function PortfolioCard({
             <motion.a
               href="/cv.pdf"
               download
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={cvButtonInitialVariants}
+              animate={cvButtonAnimateVariants}
               transition={{ delay: 0.1, duration: 0.2 }}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)",
-              }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={cvButtonHoverVariants}
+              whileTap={buttonTapVariants}
               className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-sm font-medium rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200"
             >
               <Download className="w-3.5 h-3.5" />
@@ -173,8 +347,8 @@ export function PortfolioCard({
 
           {/* Projects - Horizontal */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={projectsInitialVariants}
+            animate={projectsAnimateVariants}
             transition={{ delay: 0.12, duration: 0.2 }}
             className="flex items-center gap-2 flex-wrap justify-center"
           >
@@ -189,15 +363,11 @@ export function PortfolioCard({
                   rel="noopener noreferrer"
                   onMouseEnter={() => setHoveredProject(index)}
                   onMouseLeave={() => setHoveredProject(null)}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={projectLinkInitialVariants}
+                  animate={projectLinkAnimateVariants}
                   transition={{ delay: 0.15 + index * 0.05, duration: 0.2 }}
-                  whileHover={{
-                    scale: 1.1,
-                    y: -4,
-                    boxShadow: "0 8px 16px rgba(99, 102, 241, 0.3)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={projectLinkHoverVariants}
+                  whileTap={buttonTapVariants}
                   title={project.title}
                   className="flex items-center gap-1.5 px-2 py-1.5 bg-white/5 hover:bg-white/15 text-gray-300 hover:text-blue-400 rounded-lg border border-white/10 transition-all duration-200 group"
                   style={{
@@ -222,10 +392,10 @@ export function PortfolioCard({
           <div className="overflow-hidden h-12 flex items-center justify-center">
             <motion.p
               key={hoveredProject}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.15 }}
+              initial={descriptionInitialVariants}
+              animate={descriptionAnimateVariants}
+              exit={descriptionExitVariants}
+              transition={descriptionTransition}
               className="text-gray-300 text-xs leading-relaxed text-center"
             >
               {displayedDescription}

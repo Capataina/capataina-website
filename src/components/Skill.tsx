@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { motion } from "motion/react";
 import {
   AccordionContent,
@@ -18,6 +18,31 @@ export const Skill = memo(function Skill({
   subskills,
   bulletPoints,
 }: SkillProps) {
+  // Memoize animation variants
+  const badgeHoverVariants = useMemo(
+    () => ({
+      scale: 1.08,
+      rotate: 2,
+      boxShadow: "0 0 8px rgba(168, 150, 200, 0.4)",
+    }),
+    []
+  );
+
+  const badgeHoverTransition = useMemo(
+    () => ({
+      duration: 0.15,
+    }),
+    []
+  );
+
+  const listItemHoverVariants = useMemo(
+    () => ({
+      x: 4,
+      scale: 1.01,
+      transition: { duration: 0.1 },
+    }),
+    []
+  );
   return (
     <AccordionItem value={name} className="py-1">
       <AccordionTrigger className="text-white hover:text-zinc-300">
@@ -40,12 +65,8 @@ export const Skill = memo(function Skill({
                 }}
               >
                 <motion.div
-                  whileHover={{
-                    scale: 1.08,
-                    rotate: 2,
-                    boxShadow: "0 0 8px rgba(168, 150, 200, 0.4)",
-                  }}
-                  transition={{ duration: 0.15 }}
+                  whileHover={badgeHoverVariants}
+                  transition={badgeHoverTransition}
                 >
                   <Badge variant="secondary" className="text-xs">
                     {subskill}
@@ -66,7 +87,7 @@ export const Skill = memo(function Skill({
                 delay: subskills.length * 0.03 + index * 0.04,
                 duration: 0.2,
               }}
-              whileHover={{ x: 4, scale: 1.01, transition: { duration: 0.1 } }}
+              whileHover={listItemHoverVariants}
               className="transition-colors hover:text-zinc-200 cursor-default"
             >
               {point}

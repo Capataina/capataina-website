@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { motion } from "motion/react";
 import {
   Accordion,
@@ -30,6 +30,52 @@ export const Project = memo(function Project({
   techStack,
   technicalDetails,
 }: ProjectProps) {
+  // Memoize animation variants
+  const linkHoverVariants = useMemo(
+    () => ({
+      scale: 1.05,
+    }),
+    []
+  );
+
+  const githubIconVariants = useMemo(
+    () => ({
+      rotate: 360,
+    }),
+    []
+  );
+
+  const websiteIconVariants = useMemo(
+    () => ({
+      y: -2,
+    }),
+    []
+  );
+
+  const githubIconTransition = useMemo(
+    () => ({
+      duration: 0.4,
+    }),
+    []
+  );
+
+  const websiteIconTransition = useMemo(
+    () => ({
+      duration: 0.2,
+      type: "spring" as const,
+      stiffness: 300,
+    }),
+    []
+  );
+
+  const listItemHoverVariants = useMemo(
+    () => ({
+      x: 4,
+      scale: 1.01,
+      transition: { duration: 0.1 },
+    }),
+    []
+  );
   return (
     <div className="space-y-3 p-4 rounded-lg">
       {/* Header with Title and GitHub Link */}
@@ -42,11 +88,11 @@ export const Project = memo(function Project({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors group"
-              whileHover={{ scale: 1.05 }}
+              whileHover={linkHoverVariants}
             >
               <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.4 }}
+                whileHover={githubIconVariants}
+                transition={githubIconTransition}
               >
                 <Github className="w-4 h-4" />
               </motion.div>
@@ -59,11 +105,11 @@ export const Project = memo(function Project({
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors group"
-              whileHover={{ scale: 1.05 }}
+              whileHover={linkHoverVariants}
             >
               <motion.div
-                whileHover={{ y: -2 }}
-                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
+                whileHover={websiteIconVariants}
+                transition={websiteIconTransition}
               >
                 <ExternalLink className="w-4 h-4" />
               </motion.div>
@@ -91,7 +137,7 @@ export const Project = memo(function Project({
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05, duration: 0.2 }}
-            whileHover={{ x: 4, scale: 1.01, transition: { duration: 0.1 } }}
+            whileHover={listItemHoverVariants}
             className="transition-colors hover:text-white cursor-default"
           >
             {point}
@@ -113,11 +159,7 @@ export const Project = memo(function Project({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.04, duration: 0.2 }}
-                  whileHover={{
-                    x: 4,
-                    scale: 1.01,
-                    transition: { duration: 0.1 },
-                  }}
+                  whileHover={listItemHoverVariants}
                   className="transition-colors hover:text-zinc-200 cursor-default"
                 >
                   {detail}
