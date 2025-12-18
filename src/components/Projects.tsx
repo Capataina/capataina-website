@@ -10,6 +10,7 @@ import { asteroidsAI } from "@/projects/asteroids-ai";
 import { fraudDetection } from "@/projects/fraud-detection";
 import { gameMods } from "@/projects/game-mods";
 import { neuronika } from "@/projects/neuronika";
+import { personalWebsite } from "@/projects/personal-website";
 
 interface ProjectsProps {
   field: string;
@@ -28,6 +29,7 @@ export function Projects({ field }: ProjectsProps) {
     fraudDetection,
     gameMods,
     neuronika,
+    personalWebsite,
   ];
 
   // Filter projects based on the field

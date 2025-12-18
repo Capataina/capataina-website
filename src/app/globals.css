@@ -64,6 +64,35 @@
       height: 0;
     }
   }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
 
 :root {
@@ -133,6 +162,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Muted Purple/Lilac Accent Colors */
+  --accent-purple: oklch(0.65 0.08 285);
+  --accent-purple-dim: oklch(0.45 0.06 285);
+  --accent-purple-glow: oklch(0.55 0.12 285 / 0.3);
 }
 
 @layer base {
@@ -171,5 +205,54 @@
   * {
     scrollbar-width: thin;
     scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
+  }
+}
+
+@layer utilities {
+  .gradient-bg {
+    background: radial-gradient(
+        ellipse at top,
+        oklch(0.165 0.02 285),
+        oklch(0.145 0 0)
+      ),
+      radial-gradient(
+        ellipse at bottom right,
+        oklch(0.165 0.015 260),
+        transparent
+      );
+  }
+
+  .card-glow {
+    box-shadow: 0 0 0 1px oklch(1 0 0 / 0.05), 0 2px 8px -1px oklch(0 0 0 / 0.3),
+      0 0 12px -6px var(--accent-purple-glow);
+  }
+
+  .card-glow-hover {
+    box-shadow: 0 0 0 1px oklch(1 0 0 / 0.08),
+      0 4px 16px -2px oklch(0 0 0 / 0.4),
+      0 0 20px -6px var(--accent-purple-glow),
+      inset 0 1px 0 0 oklch(1 0 0 / 0.03);
+  }
+
+  .text-gradient-purple {
+    background: linear-gradient(
+      135deg,
+      oklch(0.85 0.1 285),
+      oklch(0.75 0.08 260)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(oklch(0.19 0 0), oklch(0.19 0 0)) padding-box,
+      linear-gradient(135deg, var(--accent-purple-dim), transparent) border-box;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
   }
 }

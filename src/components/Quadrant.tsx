@@ -91,14 +91,24 @@ export function Quadrant({
   return (
     <motion.div
       ref={quadrantRef}
-      className="flex items-center justify-center bg-zinc-800 dark:bg-zinc-800 rounded-2xl m-2"
+      className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300"
+      style={{
+        background:
+          isHovered || isSelected
+            ? "linear-gradient(135deg, oklch(0.19 0.015 285), oklch(0.175 0.01 260))"
+            : "linear-gradient(135deg, oklch(0.165 0.01 285), oklch(0.16 0 0))",
+        transformStyle: "preserve-3d",
+        perspective: 1000,
+      }}
       animate={{
         width: size.width,
         height: size.height,
         rotateX: isHovered ? -mousePosition.y * 3 : 0,
         rotateY: isHovered ? mousePosition.x * 3 : 0,
-        backgroundColor:
-          isHovered || isSelected ? "rgb(63, 63, 70)" : "rgb(39, 39, 42)",
+        boxShadow:
+          isHovered || isSelected
+            ? "0 0 0 1px oklch(0.45 0.06 285 / 0.2), 0 4px 16px -2px oklch(0 0 0 / 0.4), 0 0 20px -8px oklch(0.55 0.12 285 / 0.25), inset 0 1px 0 0 oklch(1 0 0 / 0.03)"
+            : "0 0 0 1px oklch(1 0 0 / 0.05), 0 2px 8px -1px oklch(0 0 0 / 0.3)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseMove={!isSelected ? handleMouseMove : undefined}
@@ -108,15 +118,11 @@ export function Quadrant({
         e.stopPropagation();
         onSelect(isSelected ? null : position);
       }}
-      style={{
-        transformStyle: "preserve-3d",
-        perspective: 1000,
-      }}
     >
       {isSelected ? (
         <QuadrantInterface quadrantPosition={position} field={label} />
       ) : (
-        <h2 className="text-2xl font-bold text-white">{label}</h2>
+        <h2 className="text-2xl font-bold text-gradient-purple">{label}</h2>
       )}
     </motion.div>
   );

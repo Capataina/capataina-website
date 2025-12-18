@@ -1,6 +1,7 @@
 "use client";
 
 import { Quadrant } from "@/components/Quadrant";
+import { ParticleNetwork } from "@/components/ParticleNetwork";
 import { useState } from "react";
 
 export default function Home() {
@@ -13,10 +14,12 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen w-screen flex flex-wrap bg-zinc-900 p-2"
+      className="h-screen w-screen flex flex-wrap gradient-bg p-2 relative overflow-hidden"
       style={{ perspective: 1000 }}
       onClick={handleBackgroundClick}
     >
+      {/* Interactive particle network background */}
+      <ParticleNetwork />
       <Quadrant
         position={1}
         hoveredQuadrant={hoveredQuadrant}
