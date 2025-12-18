@@ -1,10 +1,16 @@
 export const react = {
   name: "React",
   fields: ["Full Stack Development", "AI Engineering"],
+  subskills: [
+    "Hooks",
+    "Context",
+    "Performance Optimization",
+    "Component Architecture",
+  ],
   bulletPoints: [
-    "Component-based architecture",
-    "Hooks (useState, useEffect, useContext, etc.)",
-    "State management and props",
-    "Performance optimization techniques",
+    "Modern React 19 with concurrent features",
+    "Complex state management with hooks and context",
+    "Performance optimization for large-scale applications",
+    "Desktop app frontends with Tauri integration",
   ],
 };

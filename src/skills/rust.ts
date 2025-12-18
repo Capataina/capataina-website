@@ -1,10 +1,16 @@
 export const rust = {
   name: "Rust",
-  fields: ["Systems Engineering", "Full Stack Development"],
+  fields: ["Systems Engineering", "Full Stack Development", "AI Engineering"],
+  subskills: [
+    "Safe Concurrency",
+    "Async/Await",
+    "Trait-Based Design",
+    "Zero-Copy Parsing",
+  ],
   bulletPoints: [
-    "Memory safety without garbage collection",
-    "Zero-cost abstractions",
-    "Concurrent programming with ownership model",
-    "System-level programming",
+    "Building production-grade systems with memory safety guarantees",
+    "Lock-free data structures and ultra-low-latency programming",
+    "Desktop applications with Tauri v2 and IPC architecture",
+    "ML runtime development with PyTorch-style abstractions",
   ],
 };

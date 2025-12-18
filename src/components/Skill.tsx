@@ -3,19 +3,32 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 
 interface SkillProps {
   name: string;
+  subskills: string[];
   bulletPoints: string[];
 }
 
-export function Skill({ name, bulletPoints }: SkillProps) {
+export function Skill({ name, subskills, bulletPoints }: SkillProps) {
   return (
     <AccordionItem value={name}>
       <AccordionTrigger className="text-white hover:text-zinc-300">
         {name}
       </AccordionTrigger>
       <AccordionContent>
+        {/* Subskills as badges */}
+        {subskills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {subskills.map((subskill, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {subskill}
+              </Badge>
+            ))}
+          </div>
+        )}
+        {/* Bullet points */}
         <ul className="list-disc list-inside text-zinc-400 space-y-1">
           {bulletPoints.map((point, index) => (
             <li key={index}>{point}</li>
