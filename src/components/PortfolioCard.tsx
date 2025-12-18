@@ -91,7 +91,17 @@ export function PortfolioCard({
       <motion.div
         layout="size"
         className="bg-black/15 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl w-[600px]"
-        transition={{ layout: { duration: 0.2, ease: "easeOut" } }}
+        animate={{
+          y: [0, -8, 0],
+        }}
+        transition={{
+          y: {
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+          layout: { duration: 0.2, ease: "easeOut" },
+        }}
       >
         <motion.div className="p-4 space-y-3">
           {/* Header Row */}

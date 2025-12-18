@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { motion } from "motion/react";
 import {
   Accordion,
   AccordionContent,
@@ -36,26 +37,38 @@ export const Project = memo(function Project({
         <h4 className="text-lg font-semibold text-white">{title}</h4>
         <div className="flex gap-3">
           {links.github && (
-            <a
+            <motion.a
               href={links.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors group"
+              whileHover={{ scale: 1.05 }}
             >
-              <Github className="w-4 h-4" />
+              <motion.div
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.4 }}
+              >
+                <Github className="w-4 h-4" />
+              </motion.div>
               <span>GitHub</span>
-            </a>
+            </motion.a>
           )}
           {links.website && (
-            <a
+            <motion.a
               href={links.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-sm text-zinc-300 hover:text-white transition-colors group"
+              whileHover={{ scale: 1.05 }}
             >
-              <ExternalLink className="w-4 h-4" />
+              <motion.div
+                whileHover={{ y: -2 }}
+                transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
+              >
+                <ExternalLink className="w-4 h-4" />
+              </motion.div>
               <span>Website</span>
-            </a>
+            </motion.a>
           )}
         </div>
       </div>
@@ -73,7 +86,16 @@ export const Project = memo(function Project({
       {/* Description Bullet Points */}
       <ul className="list-disc list-inside text-zinc-300 space-y-1 text-sm">
         {description.map((point, index) => (
-          <li key={index}>{point}</li>
+          <motion.li
+            key={index}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05, duration: 0.2 }}
+            whileHover={{ x: 4, scale: 1.01, transition: { duration: 0.1 } }}
+            className="transition-colors hover:text-white cursor-default"
+          >
+            {point}
+          </motion.li>
         ))}
       </ul>
 
@@ -86,7 +108,20 @@ export const Project = memo(function Project({
           <AccordionContent>
             <ul className="list-disc list-inside text-zinc-400 space-y-1 text-sm">
               {technicalDetails.map((detail, index) => (
-                <li key={index}>{detail}</li>
+                <motion.li
+                  key={index}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.04, duration: 0.2 }}
+                  whileHover={{
+                    x: 4,
+                    scale: 1.01,
+                    transition: { duration: 0.1 },
+                  }}
+                  className="transition-colors hover:text-zinc-200 cursor-default"
+                >
+                  {detail}
+                </motion.li>
               ))}
             </ul>
           </AccordionContent>

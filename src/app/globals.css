@@ -97,6 +97,18 @@
       background-position: 100% 50%;
     }
   }
+
+  @keyframes pulse-subtle {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
+  --animate-pulse-subtle: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 :root {
@@ -177,6 +189,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -194,7 +211,7 @@
   ::-webkit-scrollbar-thumb {
     background: rgba(161, 161, 170, 0.3);
     border-radius: 4px;
-    transition: background 0.2s ease;
+    transition: background 0.3s ease, transform 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -209,6 +226,11 @@
   * {
     scrollbar-width: thin;
     scrollbar-color: rgba(161, 161, 170, 0.3) transparent;
+  }
+
+  /* Smooth scrolling for all scrollable elements */
+  * {
+    scroll-behavior: smooth;
   }
 }
 
