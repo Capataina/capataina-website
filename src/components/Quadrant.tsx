@@ -193,7 +193,7 @@ export function Quadrant({
   return (
     <motion.div
       ref={quadrantRef}
-      className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300"
+      className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300 select-none"
       style={{
         background:
           isHovered || isSelected ? "hsl(285, 10%, 18%)" : "hsl(285, 8%, 16%)",
@@ -231,28 +231,7 @@ export function Quadrant({
             exit={iconExitVariants}
             transition={iconTransition}
           >
-            <Icon
-              className="w-10 h-10"
-              strokeWidth={1.5}
-              style={{
-                stroke: "url(#icon-gradient)",
-                filter: "drop-shadow(0 0 8px rgba(200, 180, 255, 0.4))",
-              }}
-            />
-            <svg width="0" height="0">
-              <defs>
-                <linearGradient
-                  id="icon-gradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor="hsl(285, 60%, 80%)" />
-                  <stop offset="100%" stopColor="hsl(260, 50%, 70%)" />
-                </linearGradient>
-              </defs>
-            </svg>
+            <Icon className="w-10 h-10 icon-gradient" strokeWidth={1.5} />
           </motion.div>
         ) : (
           <motion.h2
@@ -261,7 +240,7 @@ export function Quadrant({
             animate={labelAnimateVariants}
             exit={labelExitVariants}
             transition={labelTransition}
-            className="text-2xl font-bold text-gradient-purple"
+            className="text-4xl font-bold text-gradient-purple py-2"
           >
             {label}
           </motion.h2>

@@ -19,17 +19,17 @@ export function QuadrantInterface({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header Bar */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-purple-500/20">
+      <div className="flex items-center justify-between px-6 py-3 border-b accent-border">
         {/* Close Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          className="p-2 rounded-lg hover:bg-purple-500/10 transition-colors group"
+          className="p-2 rounded-lg accent-button transition-colors group"
           aria-label="Close"
         >
-          <X className="w-5 h-5 text-purple-300/60 group-hover:text-purple-300" />
+          <X className="w-5 h-5 accent-text accent-text-hover" />
         </button>
 
         {/* Title */}
@@ -41,11 +41,11 @@ export function QuadrantInterface({
             e.stopPropagation();
             // TODO: Implement CV download
           }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 transition-colors group"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg accent-button transition-colors group"
           aria-label="Download CV"
         >
-          <Download className="w-4 h-4 text-purple-300/60 group-hover:text-purple-300" />
-          <span className="text-sm text-purple-300/60 group-hover:text-purple-300">
+          <Download className="w-4 h-4 accent-text accent-text-hover" />
+          <span className="text-sm accent-text accent-text-hover">
             Download CV
           </span>
         </button>

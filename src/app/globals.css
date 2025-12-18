@@ -178,10 +178,39 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* Muted Purple/Lilac Accent Colors */
-  --accent-purple: oklch(0.65 0.08 285);
-  --accent-purple-dim: oklch(0.45 0.06 285);
-  --accent-purple-glow: oklch(0.55 0.12 285 / 0.3);
+  /* Dynamic Accent Colors - Default (Gray) */
+  --accent-default: oklch(0.5 0.02 0);
+  --accent-default-dim: oklch(0.35 0.01 0);
+  --accent-default-glow: oklch(0.45 0.03 0 / 0.3);
+
+  /* Quadrant-specific Accent Colors */
+  /* Systems - Muted Purple/Lilac */
+  --accent-systems: oklch(0.65 0.08 285);
+  --accent-systems-dim: oklch(0.45 0.06 285);
+  --accent-systems-glow: oklch(0.55 0.12 285 / 0.3);
+
+  /* AI - Muted Blue */
+  --accent-ai: oklch(0.65 0.08 230);
+  --accent-ai-dim: oklch(0.45 0.06 230);
+  --accent-ai-glow: oklch(0.55 0.12 230 / 0.3);
+
+  /* Finance - Muted Green */
+  --accent-finance: oklch(0.65 0.08 150);
+  --accent-finance-dim: oklch(0.45 0.06 150);
+  --accent-finance-glow: oklch(0.55 0.12 150 / 0.3);
+
+  /* Full Stack - Muted Red */
+  --accent-fullstack: oklch(0.65 0.08 25);
+  --accent-fullstack-dim: oklch(0.45 0.06 25);
+  --accent-fullstack-glow: oklch(0.55 0.12 25 / 0.3);
+
+  /* Active accent color variables (will be updated dynamically) */
+  --accent-purple: var(--accent-default);
+  --accent-purple-dim: var(--accent-default-dim);
+  --accent-purple-glow: var(--accent-default-glow);
+
+  /* Transition duration for accent color changes */
+  --accent-transition-duration: 0.25s;
 }
 
 @layer base {
@@ -191,6 +220,17 @@
 
   html {
     scroll-behavior: smooth;
+    transition: --accent-purple var(--accent-transition-duration) ease,
+      --accent-purple-dim var(--accent-transition-duration) ease,
+      --accent-purple-glow var(--accent-transition-duration) ease;
+  }
+
+  @supports (transition: --accent-purple 0.25s) {
+    html {
+      transition: --accent-purple var(--accent-transition-duration) ease,
+        --accent-purple-dim var(--accent-transition-duration) ease,
+        --accent-purple-glow var(--accent-transition-duration) ease;
+    }
   }
 
   body {
@@ -247,10 +287,61 @@
   }
 
   .text-gradient-purple {
-    background: linear-gradient(135deg, hsl(285, 60%, 80%), hsl(260, 50%, 70%));
+    background: linear-gradient(
+      135deg,
+      var(--accent-purple),
+      color-mix(in srgb, var(--accent-purple) 85%, var(--accent-purple-dim) 15%)
+        50%,
+      var(--accent-purple)
+    );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    transition: background var(--accent-transition-duration) ease;
+  }
+
+  .icon-gradient {
+    stroke: var(--accent-purple);
+    filter: drop-shadow(0 0 8px var(--accent-purple-glow));
+    transition: stroke var(--accent-transition-duration) ease,
+      filter var(--accent-transition-duration) ease;
+  }
+
+  .cv-button {
+    background: linear-gradient(
+      135deg,
+      var(--accent-purple),
+      var(--accent-purple-dim)
+    );
+    transition: background var(--accent-transition-duration) ease,
+      transform 0.2s ease;
+  }
+
+  .cv-button:hover {
+    filter: brightness(1.1);
+  }
+
+  .accent-button {
+    background-color: color-mix(in srgb, var(--accent-purple) 10%, transparent);
+    transition: background-color var(--accent-transition-duration) ease;
+  }
+
+  .accent-button:hover {
+    background-color: color-mix(in srgb, var(--accent-purple) 20%, transparent);
+  }
+
+  .accent-border {
+    border-color: color-mix(in srgb, var(--accent-purple) 20%, transparent);
+    transition: border-color var(--accent-transition-duration) ease;
+  }
+
+  .accent-text {
+    color: color-mix(in srgb, var(--accent-purple) 60%, white);
+    transition: color var(--accent-transition-duration) ease;
+  }
+
+  .accent-text-hover:hover {
+    color: color-mix(in srgb, var(--accent-purple) 100%, white);
   }
 
   .border-gradient {

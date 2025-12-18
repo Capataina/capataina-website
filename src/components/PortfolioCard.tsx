@@ -324,7 +324,7 @@ export function PortfolioCard({
               initial={titleInitialVariants}
               animate={headerAnimateVariants}
               transition={{ delay: 0.08, duration: 0.2 }}
-              className="text-xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent whitespace-nowrap absolute left-1/2 -translate-x-1/2"
+              className="text-xl font-bold text-gradient-purple whitespace-nowrap absolute left-1/2 -translate-x-1/2"
             >
               Hey, I'm Capataina! 👋
             </motion.h1>
@@ -338,7 +338,7 @@ export function PortfolioCard({
               transition={{ delay: 0.1, duration: 0.2 }}
               whileHover={cvButtonHoverVariants}
               whileTap={buttonTapVariants}
-              className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-sm font-medium rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200"
+              className="px-3 py-1.5 text-white text-sm font-medium rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200 cv-button"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Full Resume</span>
