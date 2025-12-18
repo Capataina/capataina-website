@@ -10,6 +10,7 @@ export const nyquestro = {
     "Explores market microstructure without unsafe blocks or OS locks",
     "Plans multi-gateway ingestion with FIX and binary protocols",
   ],
+  techStack: "Rust",
   technicalDetails: [
     "Type-safe primitives: OrderID, price (cents), quantity, nanosecond timestamps",
     "Order and PriceLevel abstractions with FIFO queue semantics",

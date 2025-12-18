@@ -1,7 +1,7 @@
 export const vynapse = {
   title: "Vynapse — Hybrid Neuroevolution & Deep Learning Runtime",
   date: "2025 (In Progress)",
-  fields: ["AI Engineering"],
+  fields: ["AI Engineering", "Systems Engineering"],
   links: {
     github: "https://github.com/Capataina/Vynapse",
   },
@@ -10,6 +10,7 @@ export const vynapse = {
     "Enables research combining NEAT topology mutation, DEAP evolutionary search, and PyTorch-style backpropagation",
     "Supports composable evolutionary algorithms for neural architecture search",
   ],
+  techStack: "Rust",
   technicalDetails: [
     "Trait-based architecture with genome, fitness, selection, mutation, and crossover abstractions",
     "Task-based fitness evaluation system with matrix operations and activation functions",

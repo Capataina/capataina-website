@@ -10,6 +10,7 @@ export const fraudDetection = {
     "Analyzed 285,000 transactions with 0.17% fraud rate using advanced ML techniques",
     "Applied dimensionality reduction to visualize fraud clustering patterns",
   ],
+  techStack: "Python, XGBoost, scikit-learn, UMAP, PCA, t-SNE, Pandas, NumPy",
   technicalDetails: [
     "XGBoost selected for superior tabular data performance and imbalance handling",
     "UMAP, PCA, and t-SNE for dimensionality reduction and fraud pattern visualization",

@@ -37,20 +37,24 @@ export function Skills({ field }: SkillsProps) {
   const skills = allSkills.filter((skill) => skill.fields.includes(field));
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center overflow-y-auto">
-      <h3 className="text-xl font-bold text-white mb-4 text-center sticky top-0 bg-zinc-700 pb-2">
+    <div className="w-full h-full flex flex-col">
+      <h3 className="text-xl font-bold text-white text-center pt-2 pb-4">
         Skills
       </h3>
-      <Accordion type="single" collapsible className="w-full px-2">
-        {skills.map((skill) => (
-          <Skill
-            key={skill.name}
-            name={skill.name}
-            subskills={skill.subskills}
-            bulletPoints={skill.bulletPoints}
-          />
-        ))}
-      </Accordion>
+      <div className="w-full flex-1 overflow-y-auto">
+        <div className="min-h-full flex items-center">
+          <Accordion type="single" collapsible className="w-full px-2">
+            {skills.map((skill) => (
+              <Skill
+                key={skill.name}
+                name={skill.name}
+                subskills={skill.subskills}
+                bulletPoints={skill.bulletPoints}
+              />
+            ))}
+          </Accordion>
+        </div>
+      </div>
     </div>
   );
 }

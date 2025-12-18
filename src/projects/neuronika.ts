@@ -10,6 +10,7 @@ export const neuronika = {
     "Interactive graph visualization for exploring connections between notes",
     "Supports non-linear knowledge workflows with intelligent organization",
   ],
+  techStack: "TypeScript, Electron, React, OpenRouter API, Vis.js, Markdown",
   technicalDetails: [
     "LLM integration via OpenRouter for adaptive tagging and content suggestions",
     "Vector embeddings for semantic search across note collections",

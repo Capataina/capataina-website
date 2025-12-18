@@ -10,6 +10,7 @@ export const gameMods = {
     "Achieved 2,000–15,000 downloads per mod with sustained active user engagement",
     "Built systems for runtime patching, dynamic health scaling, and custom weapon mechanics",
   ],
+  techStack: "C#, Harmony, TypeScript, Node.js, Java, Forge API, tModLoader",
   technicalDetails: [
     "RimWorld: Harmony runtime patching for dynamic pawn skill progression modifications",
     "Escape from Tarkov: Real-time health scaling with SPT-AKI hooks (12K downloads)",

@@ -10,6 +10,7 @@ export const tectra = {
     "Includes market data feed handler, pre-trade risk engine, kill-switch, and deterministic replay",
     "Targets >1M messages/second per core with microsecond-level risk checks",
   ],
+  techStack: "Rust",
   technicalDetails: [
     "ITCH decoder with zero-copy parsing, gap detection, and L2 book reconstruction",
     "Hot-reloadable risk rules (price bands, size limits, throttles) without downtime",

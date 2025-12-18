@@ -10,6 +10,7 @@ export const zyphos = {
     "Explores socket programming, performance patterns, and protocol implementation details",
     "30-milestone roadmap covering HTTP/1.1, HTTP/2, WebSockets, and QUIC",
   ],
+  techStack: "Rust",
   technicalDetails: [
     "TCP listener with thread-per-connection model and HTTP/1.0 parser",
     "RFC-compliant response formatting with routing and error handling",

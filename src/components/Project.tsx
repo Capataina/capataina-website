@@ -16,6 +16,7 @@ interface ProjectProps {
   date: string;
   links: ProjectLink;
   description: string[];
+  techStack?: string;
   technicalDetails: string[];
 }
 
@@ -24,6 +25,7 @@ export function Project({
   date,
   links,
   description,
+  techStack,
   technicalDetails,
 }: ProjectProps) {
   return (
@@ -33,6 +35,9 @@ export function Project({
         <h4 className="text-lg font-semibold text-white">{title}</h4>
         <span className="text-sm text-zinc-400">{date}</span>
       </div>
+
+      {/* Tech Stack */}
+      {techStack && <p className="text-sm text-zinc-400 italic">{techStack}</p>}
 
       {/* Links */}
       {(links.github || links.website) && (

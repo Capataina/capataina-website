@@ -1,7 +1,14 @@
 export const gameDevelopment = {
   name: "Game Development & Modding",
   fields: ["Full Stack Development"],
-  subskills: ["Unity", "libGDX", "ECS Architecture", "Harmony Patching", "C#", "Java"],
+  subskills: [
+    "Unity",
+    "libGDX",
+    "ECS Architecture",
+    "Harmony Patching",
+    "C#",
+    "Java",
+  ],
   bulletPoints: [
     "Led 8-person team developing simulation game with libGDX and cross-platform testing",
     "Multithreaded roguelite with Entity Component System architecture in Unity",

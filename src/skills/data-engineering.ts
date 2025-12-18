@@ -1,7 +1,17 @@
 export const dataEngineering = {
   name: "Data Engineering & Analytics",
   fields: ["Data Engineering", "AI Engineering"],
-  subskills: ["NumPy", "Pandas", "SQLite", "Matplotlib", "Seaborn", "Plotly", "UMAP", "PCA", "t-SNE"],
+  subskills: [
+    "NumPy",
+    "Pandas",
+    "SQLite",
+    "Matplotlib",
+    "Seaborn",
+    "Plotly",
+    "UMAP",
+    "PCA",
+    "t-SNE",
+  ],
   bulletPoints: [
     "Large-scale data analysis and transformation pipelines with Pandas",
     "Advanced visualization with interactive plots using Plotly and Seaborn",

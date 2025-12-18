@@ -10,6 +10,7 @@ export const xyntra = {
     "Uses e-graph rewriting to identify kernel fusion opportunities automatically",
     "Plans WGSL and PTX code generation backends with autotuned tile sizes",
   ],
+  techStack: "Rust, ONNX",
   technicalDetails: [
     "Type-safe IR with NodeID, TensorShape, OpKind primitives, and graph representation",
     "Validation framework with cycle detection, shape compatibility, and operation constraints",

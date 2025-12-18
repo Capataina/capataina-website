@@ -10,6 +10,7 @@ export const asteroidsAI = {
     "Compares NEAT, DEAP-GA, DEAP-GP, Evolution Strategies, and GNN with Soft Actor-Critic",
     "Real-time visualization of agent learning and decision-making processes",
   ],
+  techStack: "Python, Arcade, NEAT-Python, DEAP, PyTorch, NumPy",
   technicalDetails: [
     "Python-based simulation with Arcade graphics library",
     "Multiple evolutionary and gradient-based AI approaches for comparison",

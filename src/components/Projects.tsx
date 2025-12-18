@@ -48,6 +48,7 @@ export function Projects({ field }: ProjectsProps) {
               date={project.date}
               links={project.links}
               description={project.description}
+              techStack={project.techStack}
               technicalDetails={project.technicalDetails}
             />
             {/* Divider between projects (except after last one) */}

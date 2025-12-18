@@ -10,6 +10,8 @@ export const multiLlmDebate = {
     "Recursive summarization surfaces consensus and divergence across debate rounds",
     "Supports OpenAI, Anthropic, Google, and Ollama with provider-agnostic architecture",
   ],
+  techStack:
+    "Rust, Tokio, OpenAI API, Anthropic API, Google Gemini API, Ollama",
   technicalDetails: [
     "Abstract LLM backend interface with async support and provider-agnostic design",
     "Rolling summarization algorithm tracking stance changes and pruning redundancy",

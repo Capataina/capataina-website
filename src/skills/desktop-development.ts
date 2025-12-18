@@ -1,7 +1,7 @@
 export const desktopDevelopment = {
   name: "Desktop Application Development",
   fields: ["Full Stack Development", "Systems Engineering"],
-  subskills: ["Tauri v2", "Rust Backend", "IPC Architecture", "SQLite", "Asset Protocol"],
+  subskills: ["Tauri v2", "Rust Backend", "SQLite"],
   bulletPoints: [
     "Cross-platform desktop apps with Tauri combining web frontends with Rust backends",
     "Secure IPC command system for frontend-backend communication",

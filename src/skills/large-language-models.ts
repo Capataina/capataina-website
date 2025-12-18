@@ -1,7 +1,14 @@
 export const largeLanguageModels = {
   name: "Large Language Models",
   fields: ["AI Engineering"],
-  subskills: ["OpenRouter", "Anthropic Claude", "Google Gemini", "OpenAI", "Ollama", "Prompt Engineering"],
+  subskills: [
+    "OpenRouter",
+    "Anthropic Claude",
+    "Google Gemini",
+    "OpenAI",
+    "Ollama",
+    "Prompt Engineering",
+  ],
   bulletPoints: [
     "Multi-provider LLM orchestration with async execution patterns",
     "Provider-agnostic architecture handling API differences and rate limits",
