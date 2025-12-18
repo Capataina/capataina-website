@@ -2,6 +2,7 @@
 
 import { Quadrant } from "@/components/Quadrant";
 import { ParticleNetwork } from "@/components/ParticleNetwork";
+import { PortfolioCard } from "@/components/PortfolioCard";
 import { useState } from "react";
 
 export default function Home() {
@@ -20,6 +21,13 @@ export default function Home() {
     >
       {/* Interactive particle network background */}
       <ParticleNetwork />
+
+      {/* Portfolio Card */}
+      <PortfolioCard
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+      />
+
       <Quadrant
         position={1}
         hoveredQuadrant={hoveredQuadrant}
