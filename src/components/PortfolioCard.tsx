@@ -326,7 +326,7 @@ export function PortfolioCard({
               transition={{ delay: 0.08, duration: 0.2 }}
               className="text-xl font-bold text-gradient-purple whitespace-nowrap absolute left-1/2 -translate-x-1/2"
             >
-              Hey, I'm Capataina! 👋
+              Hey, I'm Cap! 👋
             </motion.h1>
 
             {/* CV Button - Right */}
