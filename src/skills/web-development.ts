@@ -14,7 +14,7 @@ export const webDevelopment = {
     "Modern web applications with React concurrent features and server components",
     "Full-stack frameworks with Next.js app router and API routes",
     "Type-safe development with TypeScript and advanced type systems",
-    "Responsive, utility-first styling with Tailwind CSS v4",
+    "Responsive, utility-first styling with Tailwind CSS v4, Framer Motion, and Shadcn UI",
     "Backend integration with Node.js and Supabase for database and auth",
   ],
 };

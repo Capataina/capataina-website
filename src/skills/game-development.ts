@@ -14,6 +14,6 @@ export const gameDevelopment = {
     "Multithreaded roguelite with Entity Component System architecture in Unity",
     "18+ gameplay mods across multiple games with 150K+ total downloads",
     "Runtime patching with Harmony for dynamic game modifications",
-    "Custom weapon systems, AI behaviors, and progression mechanics",
+    "Custom weapon systems, AI behaviors, and progression mechanics across various projects",
   ],
 };

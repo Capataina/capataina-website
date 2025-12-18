@@ -137,19 +137,19 @@ export function ParticleNetwork() {
         const mdx = mouseRef.current.x - particle.x;
         const mdy = mouseRef.current.y - particle.y;
         const mDistanceSquared = mdx * mdx + mdy * mdy;
-        const minDistance = 200; // Increased from 150
+        const minDistance = 300; // Increased from 150
         const minDistanceSquared = minDistance * minDistance;
 
         if (mDistanceSquared < minDistanceSquared) {
           const mDistance = Math.sqrt(mDistanceSquared);
           const force = (minDistance - mDistance) / minDistance;
-          particle.vx -= (mdx / mDistance) * force * 0.3; // Reduced from 0.5
-          particle.vy -= (mdy / mDistance) * force * 0.3;
+          particle.vx -= (mdx / mDistance) * force * 0.25; // Reduced from 0.5
+          particle.vy -= (mdy / mDistance) * force * 0.25;
         }
 
         // Gentle friction to prevent extreme speeds
-        particle.vx *= 0.99; // Less friction
-        particle.vy *= 0.99;
+        particle.vx *= 0.95; // Less friction
+        particle.vy *= 0.95;
 
         // Draw connections only to nearby particles using grid
         const neighborKeys = getNeighborCells(particle.x, particle.y);

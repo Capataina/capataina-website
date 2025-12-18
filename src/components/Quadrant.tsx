@@ -137,7 +137,11 @@ export function Quadrant({
       }}
     >
       {isSelected ? (
-        <QuadrantInterface quadrantPosition={position} field={label} />
+        <QuadrantInterface
+          quadrantPosition={position}
+          field={label}
+          onClose={() => onSelect(null)}
+        />
       ) : shouldShowIcon && Icon ? (
         <motion.div
           initial={{ scale: 0, opacity: 0, rotate: -180 }}

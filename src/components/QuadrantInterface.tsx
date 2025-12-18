@@ -1,38 +1,77 @@
 import { Projects } from "./Projects";
 import { Skills } from "./Skills";
+import { X, Download } from "lucide-react";
 
 interface QuadrantInterfaceProps {
   quadrantPosition: number;
   field: string;
+  onClose: () => void;
 }
 
 export function QuadrantInterface({
   quadrantPosition,
   field,
+  onClose,
 }: QuadrantInterfaceProps) {
   return (
     <div
-      className="w-full h-full flex gap-4 p-4 relative"
+      className="w-full h-full flex flex-col relative"
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Projects Column */}
-      <div
-        className="w-[70%] rounded-lg p-4 relative card-glow"
-        style={{
-          background: "hsla(285, 8%, 19%, 0.6)",
-        }}
-      >
-        <Projects field={field} />
+      {/* Header Bar */}
+      <div className="flex items-center justify-between px-6 py-3 border-b border-purple-500/20">
+        {/* Close Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
+          className="p-2 rounded-lg hover:bg-purple-500/10 transition-colors group"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5 text-purple-300/60 group-hover:text-purple-300" />
+        </button>
+
+        {/* Title */}
+        <h2 className="text-xl font-bold text-gradient-purple">{field}</h2>
+
+        {/* Download CV Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            // TODO: Implement CV download
+          }}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 transition-colors group"
+          aria-label="Download CV"
+        >
+          <Download className="w-4 h-4 text-purple-300/60 group-hover:text-purple-300" />
+          <span className="text-sm text-purple-300/60 group-hover:text-purple-300">
+            Download CV
+          </span>
+        </button>
       </div>
 
-      {/* Skills Column */}
-      <div
-        className="w-[30%] rounded-lg p-4 card-glow"
-        style={{
-          background: "hsla(285, 8%, 19%, 0.6)",
-        }}
-      >
-        <Skills field={field} />
+      {/* Content Area */}
+      <div className="flex-1 flex gap-4 p-4 overflow-hidden">
+        {/* Projects Column */}
+        <div
+          className="w-[70%] h-full rounded-lg p-4 relative card-glow overflow-y-auto"
+          style={{
+            background: "hsla(285, 8%, 19%, 0.6)",
+          }}
+        >
+          <Projects field={field} />
+        </div>
+
+        {/* Skills Column */}
+        <div
+          className="w-[30%] h-full rounded-lg p-4 card-glow overflow-y-auto"
+          style={{
+            background: "hsla(285, 8%, 19%, 0.6)",
+          }}
+        >
+          <Skills field={field} />
+        </div>
       </div>
     </div>
   );
