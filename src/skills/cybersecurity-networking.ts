@@ -1,6 +1,9 @@
 export const cybersecurityNetworking = {
   name: "Cybersecurity & Network Analysis",
-  fields: ["Systems Engineering"],
+  fields: [
+    "Systems & Infrastructure Engineer",
+    "Product & Full Stack Engineer",
+  ],
   subskills: [
     "Wireshark",
     "Nmap",

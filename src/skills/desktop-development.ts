@@ -1,6 +1,9 @@
 export const desktopDevelopment = {
   name: "Desktop Application Development",
-  fields: ["Full Stack Development", "Systems Engineering"],
+  fields: [
+    "Product & Full Stack Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   subskills: ["Tauri v2", "Rust Backend", "SQLite"],
   bulletPoints: [
     "Cross-platform desktop apps with Tauri combining web frontends with Rust backends",

@@ -1,6 +1,6 @@
 export const webDevelopment = {
   name: "Full-Stack Web Development",
-  fields: ["Full Stack Development"],
+  fields: ["Product & Full Stack Engineer"],
   subskills: [
     "React 19",
     "Next.js 16",

@@ -1,6 +1,9 @@
 export const mathematicsOptimization = {
   name: "Mathematics & Optimization",
-  fields: ["AI Engineering", "Systems Engineering"],
+  fields: [
+    "Applied AI & ML Infrastructure Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   subskills: [
     "Linear Algebra",
     "Tensor Algebra",

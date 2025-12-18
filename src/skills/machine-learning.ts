@@ -1,6 +1,6 @@
 export const machineLearning = {
   name: "Machine Learning & AI",
-  fields: ["AI Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   subskills: [
     "PyTorch",
     "TensorFlow",

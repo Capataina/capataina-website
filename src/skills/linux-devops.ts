@@ -1,6 +1,11 @@
 export const linuxDevOps = {
   name: "Linux & DevOps",
-  fields: ["Systems Engineering", "Data Engineering"],
+  fields: [
+    "Systems & Infrastructure Engineer",
+    "Applied AI & ML Infrastructure Engineer",
+    "Product & Full Stack Engineer",
+    "Low Level Financial Systems Engineer",
+  ],
   subskills: [
     "NixOS",
     "Arch Linux",

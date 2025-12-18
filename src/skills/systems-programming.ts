@@ -1,6 +1,9 @@
 export const systemsProgramming = {
   name: "Systems & Low-Latency Programming",
-  fields: ["Systems Engineering"],
+  fields: [
+    "Systems & Infrastructure Engineer",
+    "Low Level Financial Systems Engineer",
+  ],
   subskills: [
     "Rust",
     "C++20",

@@ -1,6 +1,9 @@
 export const compilerGPU = {
   name: "Compiler & GPU Tooling",
-  fields: ["Systems Engineering", "AI Engineering"],
+  fields: [
+    "Applied AI & ML Infrastructure Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   subskills: [
     "IR Design",
     "E-graph Rewriting",

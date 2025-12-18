@@ -1,6 +1,6 @@
 export const gameDevelopment = {
   name: "Game Development & Modding",
-  fields: ["Full Stack Development"],
+  fields: ["Product & Full Stack Engineer"],
   subskills: [
     "Unity",
     "libGDX",

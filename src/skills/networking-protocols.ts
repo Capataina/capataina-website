@@ -1,6 +1,6 @@
 export const networkingProtocols = {
   name: "Networking & Protocol Implementation",
-  fields: ["Systems Engineering"],
+  fields: ["Systems & Infrastructure Engineer"],
   subskills: [
     "TCP/UDP Sockets",
     "HTTP/1.1",

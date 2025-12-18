@@ -1,6 +1,6 @@
 export const dataEngineering = {
   name: "Data Engineering & Analytics",
-  fields: ["Data Engineering", "AI Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   subskills: [
     "NumPy",
     "Pandas",

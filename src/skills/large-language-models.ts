@@ -1,6 +1,6 @@
 export const largeLanguageModels = {
   name: "Large Language Models",
-  fields: ["AI Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   subskills: [
     "OpenRouter",
     "Anthropic Claude",
