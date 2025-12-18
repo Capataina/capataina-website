@@ -1,7 +1,7 @@
 export const multiLlmDebate = {
   title: "Multi-LLM Debate CLI — AI Orchestration Framework",
   date: "2025 (In Progress)",
-  fields: ["AI Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   links: {
     github: "https://github.com/Capataina/Multi-LLM-Debate-CLI",
   },

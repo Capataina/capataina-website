@@ -1,7 +1,7 @@
 export const fraudDetection = {
   title: "Credit Card Fraud Detection",
   date: "2024",
-  fields: ["Data Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   links: {
     github: "https://github.com/Capataina/FraudulentActivityInCreditCard",
   },

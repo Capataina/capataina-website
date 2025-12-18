@@ -83,7 +83,7 @@ export function PortfolioCard({
         scale: isVisible ? 1 : 0.96,
         x: offset.x,
       }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
       style={{ pointerEvents: isVisible ? "auto" : "none" }}
       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
       onClick={(e) => e.stopPropagation()}
@@ -91,21 +91,21 @@ export function PortfolioCard({
       <motion.div
         layout="size"
         className="bg-black/15 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl w-[600px]"
-        transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
+        transition={{ layout: { duration: 0.2, ease: "easeOut" } }}
       >
         <motion.div className="p-4 space-y-3">
           {/* Header Row */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.05, duration: 0.2 }}
             className="flex items-center justify-between gap-3"
           >
             {/* Social Links - Left */}
             <motion.div
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.1, duration: 0.2 }}
               className="flex items-center gap-2"
             >
               <motion.a
@@ -136,7 +136,7 @@ export function PortfolioCard({
             <motion.h1
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.08, duration: 0.2 }}
               className="text-xl font-bold text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent whitespace-nowrap absolute left-1/2 -translate-x-1/2"
             >
               Hey, I'm Capataina! 👋
@@ -148,7 +148,7 @@ export function PortfolioCard({
               download
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.1, duration: 0.2 }}
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 0 20px rgba(99, 102, 241, 0.5)",
@@ -165,7 +165,7 @@ export function PortfolioCard({
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.12, duration: 0.2 }}
             className="flex items-center gap-2 flex-wrap justify-center"
           >
             {highlightedProjects.map((project, index) => {
@@ -181,7 +181,7 @@ export function PortfolioCard({
                   onMouseLeave={() => setHoveredProject(null)}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
+                  transition={{ delay: 0.15 + index * 0.05, duration: 0.2 }}
                   whileHover={{
                     scale: 1.1,
                     y: -4,
@@ -198,7 +198,7 @@ export function PortfolioCard({
                 >
                   <motion.div
                     animate={{ rotate: isHovered ? 360 : 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.3 }}
                   >
                     <Icon className="w-3.5 h-3.5" />
                   </motion.div>
@@ -215,7 +215,7 @@ export function PortfolioCard({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.15 }}
               className="text-gray-300 text-xs leading-relaxed text-center"
             >
               {displayedDescription}

@@ -1,7 +1,7 @@
 export const asteroidsAI = {
   title: "AsteroidsAI — Neuroevolution Game AI with Visualization",
   date: "2024",
-  fields: ["AI Engineering"],
+  fields: ["Applied AI & ML Infrastructure Engineer"],
   links: {
     github: "https://github.com/Capataina/Asteroids-AI",
   },

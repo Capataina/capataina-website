@@ -1,7 +1,7 @@
 export const personalWebsite = {
   title: "Personal Website — The Website You're Viewing Now!",
   date: "2025",
-  fields: ["Full Stack Development"],
+  fields: ["Product & Full Stack Engineer"],
   links: {
     github: "https://github.com/Capataina/capataina-website",
   },

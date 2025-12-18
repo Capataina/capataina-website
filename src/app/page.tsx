@@ -34,7 +34,7 @@ export default function Home() {
         selectedQuadrant={selectedQuadrant}
         onHoverChange={setHoveredQuadrant}
         onSelect={setSelectedQuadrant}
-        label="Systems Engineering"
+        label="Systems & Infrastructure Engineer"
       />
       <Quadrant
         position={2}
@@ -42,7 +42,7 @@ export default function Home() {
         selectedQuadrant={selectedQuadrant}
         onHoverChange={setHoveredQuadrant}
         onSelect={setSelectedQuadrant}
-        label="AI Engineering"
+        label="Applied AI & ML Infrastructure Engineer"
       />
       <Quadrant
         position={3}
@@ -50,7 +50,7 @@ export default function Home() {
         selectedQuadrant={selectedQuadrant}
         onHoverChange={setHoveredQuadrant}
         onSelect={setSelectedQuadrant}
-        label="Full Stack Development"
+        label="Low Level Financial Systems Engineer"
       />
       <Quadrant
         position={4}
@@ -58,7 +58,7 @@ export default function Home() {
         selectedQuadrant={selectedQuadrant}
         onHoverChange={setHoveredQuadrant}
         onSelect={setSelectedQuadrant}
-        label="Data Engineering"
+        label="Product & Full Stack Engineer"
       />
     </div>
   );

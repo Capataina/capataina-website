@@ -1,7 +1,10 @@
 export const nyquestro = {
   title: "Nyquestro — Lock-Free Limit Order Book Trading Engine",
   date: "2025 (In Progress)",
-  fields: ["Systems Engineering"],
+  fields: [
+    "Systems & Infrastructure Engineer",
+    "Low Level Financial Systems Engineer",
+  ],
   links: {
     github: "https://github.com/Capataina/Nyquestro",
   },

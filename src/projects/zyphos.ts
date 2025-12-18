@@ -1,7 +1,7 @@
 export const zyphos = {
   title: "Zyphos — HTTP Server & Network Protocol Laboratory",
   date: "2025 (In Progress)",
-  fields: ["Systems Engineering"],
+  fields: ["Systems & Infrastructure Engineer"],
   links: {
     github: "https://github.com/Capataina/Zyphos",
   },

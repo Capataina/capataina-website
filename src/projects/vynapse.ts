@@ -1,7 +1,10 @@
 export const vynapse = {
   title: "Vynapse — Hybrid Neuroevolution & Deep Learning Runtime",
   date: "2025 (In Progress)",
-  fields: ["AI Engineering", "Systems Engineering"],
+  fields: [
+    "Applied AI & ML Infrastructure Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   links: {
     github: "https://github.com/Capataina/Vynapse",
   },

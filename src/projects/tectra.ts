@@ -1,7 +1,10 @@
 export const tectra = {
   title: "Tectra — High-Performance Hybrid Trading Infrastructure",
   date: "2025 (In Progress)",
-  fields: ["Systems Engineering"],
+  fields: [
+    "Low Level Financial Systems Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   links: {
     github: "https://github.com/Capataina/Tectra",
   },

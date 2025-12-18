@@ -1,7 +1,7 @@
 export const gameMods = {
   title: "Game Mods — 150K+ Total Downloads",
   date: "2020-2024",
-  fields: ["Full Stack Development"],
+  fields: ["Product & Full Stack Engineer"],
   links: {
     github: "https://github.com/Capataina",
   },

@@ -1,7 +1,10 @@
 export const xyntra = {
   title: "Xyntra — ML Graph Fusion Compiler Pass",
   date: "2025 (In Progress)",
-  fields: ["AI Engineering", "Systems Engineering"],
+  fields: [
+    "Applied AI & ML Infrastructure Engineer",
+    "Systems & Infrastructure Engineer",
+  ],
   links: {
     github: "https://github.com/Capataina/Xyntra",
   },

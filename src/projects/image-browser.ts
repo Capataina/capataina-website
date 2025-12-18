@@ -1,7 +1,10 @@
 export const imageBrowser = {
   title: "Image Browser — Local-First Pinterest-Style Image Manager",
   date: "2024",
-  fields: ["Full Stack Development", "AI Engineering"],
+  fields: [
+    "Product & Full Stack Engineer",
+    "Applied AI & ML Infrastructure Engineer",
+  ],
   links: {
     github: "https://github.com/Capataina/PinterestStyleImageBrowser",
   },

@@ -1,16 +1,16 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState, useRef, MouseEvent, useCallback, useMemo } from "react";
 import { QuadrantInterface } from "./QuadrantInterface";
 import { Cpu, Brain, Code, Database, LucideIcon } from "lucide-react";
 
 // Icon mapping for each quadrant label
 const labelIconMap: Record<string, LucideIcon> = {
-  "Systems Engineering": Cpu,
-  "AI Engineering": Brain,
-  "Full Stack Development": Code,
-  "Data Engineering": Database,
+  "Systems & Infrastructure Engineer": Cpu,
+  "Applied AI & ML Infrastructure Engineer": Brain,
+  "Product & Full Stack Engineer": Code,
+  "Low Level Financial Systems Engineer": Database,
 };
 
 interface QuadrantProps {
@@ -127,7 +127,7 @@ export function Quadrant({
             ? "0 4px 16px -2px rgba(0, 0, 0, 0.4)"
             : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
       }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      transition={{ type: "spring", stiffness: 500, damping: 25 }}
       onMouseMove={!isSelected ? handleMouseMove : undefined}
       onMouseEnter={() => !isSelected && onHoverChange(position)}
       onMouseLeave={() => !isSelected && onHoverChange(null)}
@@ -136,58 +136,63 @@ export function Quadrant({
         onSelect(isSelected ? null : position);
       }}
     >
-      {isSelected ? (
-        <QuadrantInterface
-          quadrantPosition={position}
-          field={label}
-          onClose={() => onSelect(null)}
-        />
-      ) : shouldShowIcon && Icon ? (
-        <motion.div
-          initial={{ scale: 0, opacity: 0, rotate: -180 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          exit={{ scale: 0, opacity: 0, rotate: 180 }}
-          transition={{
-            type: "spring",
-            stiffness: 200,
-            damping: 20,
-            duration: 1,
-          }}
-        >
-          <Icon
-            className="w-10 h-10"
-            strokeWidth={1.5}
-            style={{
-              stroke: "url(#icon-gradient)",
-              filter: "drop-shadow(0 0 8px rgba(200, 180, 255, 0.4))",
-            }}
+      <AnimatePresence mode="popLayout">
+        {isSelected ? (
+          <QuadrantInterface
+            key="interface"
+            quadrantPosition={position}
+            field={label}
+            onClose={() => onSelect(null)}
           />
-          <svg width="0" height="0">
-            <defs>
-              <linearGradient
-                id="icon-gradient"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="hsl(285, 60%, 80%)" />
-                <stop offset="100%" stopColor="hsl(260, 50%, 70%)" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </motion.div>
-      ) : (
-        <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-2xl font-bold text-gradient-purple"
-        >
-          {label}
-        </motion.h2>
-      )}
+        ) : shouldShowIcon && Icon ? (
+          <motion.div
+            key="icon"
+            initial={{ scale: 0, opacity: 0, rotate: -180 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            exit={{ scale: 0, opacity: 0, rotate: 180 }}
+            transition={{
+              type: "spring",
+              stiffness: 350,
+              damping: 20,
+              duration: 0.3,
+            }}
+          >
+            <Icon
+              className="w-10 h-10"
+              strokeWidth={1.5}
+              style={{
+                stroke: "url(#icon-gradient)",
+                filter: "drop-shadow(0 0 8px rgba(200, 180, 255, 0.4))",
+              }}
+            />
+            <svg width="0" height="0">
+              <defs>
+                <linearGradient
+                  id="icon-gradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor="hsl(285, 60%, 80%)" />
+                  <stop offset="100%" stopColor="hsl(260, 50%, 70%)" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
+        ) : (
+          <motion.h2
+            key="label"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="text-2xl font-bold text-gradient-purple"
+          >
+            {label}
+          </motion.h2>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
