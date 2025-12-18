@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   AccordionContent,
   AccordionItem,
@@ -11,7 +12,11 @@ interface SkillProps {
   bulletPoints: string[];
 }
 
-export function Skill({ name, subskills, bulletPoints }: SkillProps) {
+export const Skill = memo(function Skill({
+  name,
+  subskills,
+  bulletPoints,
+}: SkillProps) {
   return (
     <AccordionItem value={name}>
       <AccordionTrigger className="text-white hover:text-zinc-300">
@@ -37,4 +42,4 @@ export function Skill({ name, subskills, bulletPoints }: SkillProps) {
       </AccordionContent>
     </AccordionItem>
   );
-}
+});

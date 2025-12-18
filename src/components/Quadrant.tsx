@@ -1,8 +1,17 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useState, useRef, MouseEvent } from "react";
+import { useState, useRef, MouseEvent, useCallback, useMemo } from "react";
 import { QuadrantInterface } from "./QuadrantInterface";
+import { Cpu, Brain, Code, Database, LucideIcon } from "lucide-react";
+
+// Icon mapping for each quadrant label
+const labelIconMap: Record<string, LucideIcon> = {
+  "Systems Engineering": Cpu,
+  "AI Engineering": Brain,
+  "Full Stack Development": Code,
+  "Data Engineering": Database,
+};
 
 interface QuadrantProps {
   position: number;
@@ -23,12 +32,21 @@ export function Quadrant({
 }: QuadrantProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const quadrantRef = useRef<HTMLDivElement>(null);
+  const lastUpdateRef = useRef<number>(0);
 
   const isSelected = selectedQuadrant === position;
   const isHovered = hoveredQuadrant === position && !isSelected;
   const isAnyHovered = hoveredQuadrant !== null && selectedQuadrant === null;
+  const shouldShowIcon = selectedQuadrant !== null && !isSelected;
 
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+  const Icon = labelIconMap[label];
+
+  // Throttle mouse movement to ~30fps (32ms) for performance
+  const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
+    const now = Date.now();
+    if (now - lastUpdateRef.current < 32) return;
+    lastUpdateRef.current = now;
+
     if (!quadrantRef.current) return;
 
     const rect = quadrantRef.current.getBoundingClientRect();
@@ -40,10 +58,10 @@ export function Quadrant({
     const y = (e.clientY - centerY) / (rect.height / 2);
 
     setMousePosition({ x, y });
-  };
+  }, []);
 
-  // Calculate size based on position and which quadrant is hovered or selected
-  const getSize = () => {
+  // Memoize size calculation
+  const size = useMemo(() => {
     if (isSelected) {
       return { width: "calc(80% - 16px)", height: "calc(80% - 16px)" };
     }
@@ -84,9 +102,14 @@ export function Quadrant({
     const height = sharesSameRow ? "calc(55% - 16px)" : "calc(45% - 16px)";
 
     return { width, height };
-  };
-
-  const size = getSize();
+  }, [
+    isSelected,
+    selectedQuadrant,
+    isAnyHovered,
+    isHovered,
+    position,
+    hoveredQuadrant,
+  ]);
 
   return (
     <motion.div
@@ -94,21 +117,15 @@ export function Quadrant({
       className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300"
       style={{
         background:
-          isHovered || isSelected
-            ? "linear-gradient(135deg, oklch(0.19 0.015 285), oklch(0.175 0.01 260))"
-            : "linear-gradient(135deg, oklch(0.165 0.01 285), oklch(0.16 0 0))",
-        transformStyle: "preserve-3d",
-        perspective: 1000,
+          isHovered || isSelected ? "hsl(285, 10%, 18%)" : "hsl(285, 8%, 16%)",
       }}
       animate={{
         width: size.width,
         height: size.height,
-        rotateX: isHovered ? -mousePosition.y * 3 : 0,
-        rotateY: isHovered ? mousePosition.x * 3 : 0,
         boxShadow:
           isHovered || isSelected
-            ? "0 0 0 1px oklch(0.45 0.06 285 / 0.2), 0 4px 16px -2px oklch(0 0 0 / 0.4), 0 0 20px -8px oklch(0.55 0.12 285 / 0.25), inset 0 1px 0 0 oklch(1 0 0 / 0.03)"
-            : "0 0 0 1px oklch(1 0 0 / 0.05), 0 2px 8px -1px oklch(0 0 0 / 0.3)",
+            ? "0 4px 16px -2px rgba(0, 0, 0, 0.4)"
+            : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseMove={!isSelected ? handleMouseMove : undefined}
@@ -121,8 +138,51 @@ export function Quadrant({
     >
       {isSelected ? (
         <QuadrantInterface quadrantPosition={position} field={label} />
+      ) : shouldShowIcon && Icon ? (
+        <motion.div
+          initial={{ scale: 0, opacity: 0, rotate: -180 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
+          exit={{ scale: 0, opacity: 0, rotate: 180 }}
+          transition={{
+            type: "spring",
+            stiffness: 200,
+            damping: 20,
+            duration: 1,
+          }}
+        >
+          <Icon
+            className="w-10 h-10"
+            strokeWidth={1.5}
+            style={{
+              stroke: "url(#icon-gradient)",
+              filter: "drop-shadow(0 0 8px rgba(200, 180, 255, 0.4))",
+            }}
+          />
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient
+                id="icon-gradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stopColor="hsl(285, 60%, 80%)" />
+                <stop offset="100%" stopColor="hsl(260, 50%, 70%)" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </motion.div>
       ) : (
-        <h2 className="text-2xl font-bold text-gradient-purple">{label}</h2>
+        <motion.h2
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-2xl font-bold text-gradient-purple"
+        >
+          {label}
+        </motion.h2>
       )}
     </motion.div>
   );

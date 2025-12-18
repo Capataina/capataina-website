@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { Skill } from "./Skill";
 import { machineLearning } from "@/skills/machine-learning";
@@ -17,7 +18,7 @@ interface SkillsProps {
   field: string;
 }
 
-export function Skills({ field }: SkillsProps) {
+export const Skills = memo(function Skills({ field }: SkillsProps) {
   const allSkills = [
     machineLearning,
     webDevelopment,
@@ -33,8 +34,11 @@ export function Skills({ field }: SkillsProps) {
     gameDevelopment,
   ];
 
-  // Filter skills based on the field
-  const skills = allSkills.filter((skill) => skill.fields.includes(field));
+  // Filter skills based on the field - memoized
+  const skills = useMemo(
+    () => allSkills.filter((skill) => skill.fields.includes(field)),
+    [field]
+  );
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -57,4 +61,4 @@ export function Skills({ field }: SkillsProps) {
       </div>
     </div>
   );
-}
+});

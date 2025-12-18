@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +21,7 @@ interface ProjectProps {
   technicalDetails: string[];
 }
 
-export function Project({
+export const Project = memo(function Project({
   title,
   date,
   links,
@@ -91,4 +92,4 @@ export function Project({
       </Accordion>
     </div>
   );
-}
+});

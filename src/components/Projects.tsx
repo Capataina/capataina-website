@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { Project } from "./Project";
 import { imageBrowser } from "@/projects/image-browser";
 import { tectra } from "@/projects/tectra";
@@ -16,7 +17,7 @@ interface ProjectsProps {
   field: string;
 }
 
-export function Projects({ field }: ProjectsProps) {
+export const Projects = memo(function Projects({ field }: ProjectsProps) {
   const allProjects = [
     imageBrowser,
     tectra,
@@ -32,9 +33,10 @@ export function Projects({ field }: ProjectsProps) {
     personalWebsite,
   ];
 
-  // Filter projects based on the field
-  const projects = allProjects.filter((project) =>
-    project.fields.includes(field)
+  // Filter projects based on the field - memoized
+  const projects = useMemo(
+    () => allProjects.filter((project) => project.fields.includes(field)),
+    [field]
   );
 
   return (
@@ -62,4 +64,4 @@ export function Projects({ field }: ProjectsProps) {
       </div>
     </div>
   );
-}
+});
