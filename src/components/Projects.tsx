@@ -44,7 +44,7 @@ export const Projects = memo(function Projects({ field }: ProjectsProps) {
       <h3 className="text-xl font-bold text-white mb-4 text-center">
         Projects
       </h3>
-      <div className="flex-1 overflow-y-auto px-2 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 space-y-4">
         {projects.map((project, index) => (
           <div key={project.title}>
             <Project
@@ -57,7 +57,7 @@ export const Projects = memo(function Projects({ field }: ProjectsProps) {
             />
             {/* Divider between projects (except after last one) */}
             {index < projects.length - 1 && (
-              <div className="mt-6 border-t border-zinc-600" />
+              <div className="mt-4 border-t border-zinc-600" />
             )}
           </div>
         ))}

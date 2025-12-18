@@ -45,7 +45,7 @@ export const Skills = memo(function Skills({ field }: SkillsProps) {
       <h3 className="text-xl font-bold text-white text-center pt-2 pb-4">
         Skills
       </h3>
-      <div className="w-full flex-1 overflow-y-auto">
+      <div className="w-full flex-1 overflow-y-auto px-2">
         <div className="min-h-full flex items-center">
           <Accordion type="single" collapsible className="w-full px-2">
             {skills.map((skill) => (

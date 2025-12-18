@@ -18,7 +18,7 @@ export const Skill = memo(function Skill({
   bulletPoints,
 }: SkillProps) {
   return (
-    <AccordionItem value={name}>
+    <AccordionItem value={name} className="py-1">
       <AccordionTrigger className="text-white hover:text-zinc-300">
         {name}
       </AccordionTrigger>

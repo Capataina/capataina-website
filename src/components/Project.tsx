@@ -30,18 +30,10 @@ export const Project = memo(function Project({
   technicalDetails,
 }: ProjectProps) {
   return (
-    <div className="space-y-3">
-      {/* Header with Title and Date */}
+    <div className="space-y-3 p-4 rounded-lg">
+      {/* Header with Title and GitHub Link */}
       <div className="flex justify-between items-start">
         <h4 className="text-lg font-semibold text-white">{title}</h4>
-        <span className="text-sm text-zinc-400">{date}</span>
-      </div>
-
-      {/* Tech Stack */}
-      {techStack && <p className="text-sm text-zinc-400 italic">{techStack}</p>}
-
-      {/* Links */}
-      {(links.github || links.website) && (
         <div className="flex gap-3">
           {links.github && (
             <a
@@ -66,7 +58,17 @@ export const Project = memo(function Project({
             </a>
           )}
         </div>
-      )}
+      </div>
+
+      {/* Tech Stack and Date */}
+      <div className="flex justify-between items-start">
+        {techStack && (
+          <p className="text-sm text-zinc-400 italic">{techStack}</p>
+        )}
+        <span className="text-sm text-zinc-400 whitespace-nowrap ml-4">
+          {date}
+        </span>
+      </div>
 
       {/* Description Bullet Points */}
       <ul className="list-disc list-inside text-zinc-300 space-y-1 text-sm">
