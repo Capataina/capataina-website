@@ -14,11 +14,11 @@ interface HighlightedProject {
 
 const highlightedProjects: HighlightedProject[] = [
   {
-    title: "Tectra",
+    title: "Nyquestro",
     icon: Cpu,
-    link: "https://github.com/Capataina/Tectra",
+    link: "https://github.com/Capataina/Nyquestro",
     description:
-      "High-performance all inclusive hybrid trading infrastructure targeting >1M messages/sec with microsecond-level risk checks.",
+      "Lock-free low-latency limit order book and matching engine exploring market microstructure, price-time priority, and ultra-fast order processing in safe Rust.",
   },
   {
     title: "Image Browser",
