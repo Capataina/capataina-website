@@ -331,7 +331,7 @@ export function PortfolioCard({
 
             {/* CV Button - Right */}
             <motion.a
-              href="/cv.pdf"
+              href="/cv/generic-cv.pdf"
               download
               initial={cvButtonInitialVariants}
               animate={cvButtonAnimateVariants}
