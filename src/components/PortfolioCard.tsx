@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { Github, Linkedin, Download } from "lucide-react";
+import { Download, GitBranch, Github, Linkedin } from "lucide-react";
 import { Cpu, Brain, Sparkles } from "lucide-react";
 import { useState, useMemo } from "react";
 
@@ -33,6 +33,13 @@ const highlightedProjects: HighlightedProject[] = [
     link: "https://github.com/Capataina/Vynapse",
     description:
       "A neuroevolution and deep learning framework built from scratch in Rust, inspired by Pytorch, Tensorflow, Deap and NEAT.",
+  },
+  {
+    title: "Chrona",
+    icon: GitBranch,
+    link: " https://github.com/Capataina/Chrona",
+    description:
+      "A lightweight, high-performance git clone written as a learning project. Implements core git features with a focus on speed and efficiency using C++.",
   },
 ];
 
