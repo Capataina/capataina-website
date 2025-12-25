@@ -1,5 +1,7 @@
 import { Projects } from "./Projects";
 import { Skills } from "./Skills";
+import { Educations } from "./Educations";
+import { Certificates } from "./Certificates";
 import { X, Download } from "lucide-react";
 
 interface QuadrantInterfaceProps {
@@ -53,14 +55,20 @@ export function QuadrantInterface({
 
       {/* Content Area */}
       <div className="flex-1 flex gap-4 p-4 overflow-hidden">
-        {/* Projects Column */}
+        {/* Left Column: Education, Projects, and Certificates */}
         <div
           className="w-[70%] h-full rounded-lg p-4 relative card-glow overflow-y-auto"
           style={{
             background: "hsla(285, 8%, 19%, 0.6)",
           }}
         >
-          <Projects field={field} />
+          <div className="space-y-4">
+            <Educations field={field} />
+            <div className="border-t border-zinc-600" />
+            <Projects field={field} />
+            <div className="border-t border-zinc-600" />
+            <Certificates field={field} />
+          </div>
         </div>
 
         {/* Skills Column */}
