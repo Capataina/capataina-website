@@ -36,7 +36,10 @@ export const Skills = memo(function Skills({ field }: SkillsProps) {
 
   // Filter skills based on the field - memoized
   const skills = useMemo(
-    () => allSkills.filter((skill) => skill.fields.includes(field)),
+    () =>
+      allSkills
+        .filter((skill) => skill.fields.includes(field))
+        .sort((a, b) => a.name.localeCompare(b.name)),
     [field]
   );
 

@@ -35,16 +35,24 @@ export const Projects = memo(function Projects({ field }: ProjectsProps) {
 
   // Filter projects based on the field - memoized
   const projects = useMemo(
-    () => allProjects.filter((project) => project.fields.includes(field)),
+    () =>
+      allProjects
+        .filter((project) => project.fields.includes(field))
+        .sort((a, b) => a.title.localeCompare(b.title)),
     [field]
   );
 
+  // Don't render if there are no projects
+  if (projects.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="w-full h-full flex flex-col overflow-hidden">
-      <h3 className="text-xl font-bold text-white mb-4 text-center">
+    <div className="w-full flex flex-col">
+      <h3 className="text-xl font-bold text-white mb-3 text-center">
         Projects
       </h3>
-      <div className="flex-1 overflow-y-auto px-4 space-y-4">
+      <div className="space-y-3">
         {projects.map((project, index) => (
           <div key={project.title}>
             <Project
@@ -57,7 +65,7 @@ export const Projects = memo(function Projects({ field }: ProjectsProps) {
             />
             {/* Divider between projects (except after last one) */}
             {index < projects.length - 1 && (
-              <div className="mt-4 border-t border-zinc-600" />
+              <div className="mt-3 border-t border-zinc-600" />
             )}
           </div>
         ))}

@@ -104,6 +104,26 @@ export function ParticleNetwork() {
         particle.vx += (Math.random() - 0.5) * 0.05;
         particle.vy += (Math.random() - 0.5) * 0.05;
 
+        // Gentle center attraction to prevent clustering at edges
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const toCenterX = centerX - particle.x;
+        const toCenterY = centerY - particle.y;
+        const distanceToCenter = Math.sqrt(
+          toCenterX * toCenterX + toCenterY * toCenterY
+        );
+        const maxDistanceFromCenter = Math.sqrt(
+          centerX * centerX + centerY * centerY
+        );
+
+        // Stronger pull the further from center
+        const centerPullStrength =
+          (distanceToCenter / maxDistanceFromCenter) * 0.015;
+        if (distanceToCenter > 0) {
+          particle.vx += (toCenterX / distanceToCenter) * centerPullStrength;
+          particle.vy += (toCenterY / distanceToCenter) * centerPullStrength;
+        }
+
         // Gentle particle repulsion - large radius, low strength
         const repulsionNeighbors = getNeighborCells(particle.x, particle.y);
         const repulsionRadius = 80;
@@ -137,19 +157,19 @@ export function ParticleNetwork() {
         const mdx = mouseRef.current.x - particle.x;
         const mdy = mouseRef.current.y - particle.y;
         const mDistanceSquared = mdx * mdx + mdy * mdy;
-        const minDistance = 300; // Increased from 150
+        const minDistance = 450; // Increased from 150
         const minDistanceSquared = minDistance * minDistance;
 
         if (mDistanceSquared < minDistanceSquared) {
           const mDistance = Math.sqrt(mDistanceSquared);
           const force = (minDistance - mDistance) / minDistance;
-          particle.vx -= (mdx / mDistance) * force * 0.25; // Reduced from 0.5
-          particle.vy -= (mdy / mDistance) * force * 0.25;
+          particle.vx -= (mdx / mDistance) * force * 0.5; // Reduced from 0.5
+          particle.vy -= (mdy / mDistance) * force * 0.5;
         }
 
         // Gentle friction to prevent extreme speeds
-        particle.vx *= 0.95; // Less friction
-        particle.vy *= 0.95;
+        particle.vx *= 0.99; // Less friction
+        particle.vy *= 0.99;
 
         // Draw connections only to nearby particles using grid
         const neighborKeys = getNeighborCells(particle.x, particle.y);

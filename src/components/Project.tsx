@@ -77,7 +77,7 @@ export const Project = memo(function Project({
     []
   );
   return (
-    <div className="space-y-3 p-4 rounded-lg">
+    <div className="space-y-2 p-3 rounded-lg">
       {/* Header with Title and GitHub Link */}
       <div className="flex justify-between items-start">
         <h4 className="text-lg font-semibold text-white">{title}</h4>
@@ -130,7 +130,7 @@ export const Project = memo(function Project({
       </div>
 
       {/* Description Bullet Points */}
-      <ul className="list-disc list-inside text-zinc-300 space-y-1 text-sm">
+      <ul className="list-disc list-inside text-zinc-300 space-y-0.5 text-sm">
         {description.map((point, index) => (
           <motion.li
             key={index}
@@ -148,11 +148,11 @@ export const Project = memo(function Project({
       {/* Technical Details Accordion */}
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="technical-details">
-          <AccordionTrigger className="text-sm text-zinc-300 hover:text-white py-2">
+          <AccordionTrigger className="text-sm text-zinc-300 hover:text-white py-1.5">
             Technical Details
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="list-disc list-inside text-zinc-400 space-y-1 text-sm">
+            <ul className="list-disc list-inside text-zinc-400 space-y-0.5 text-sm">
               {technicalDetails.map((detail, index) => (
                 <motion.li
                   key={index}
