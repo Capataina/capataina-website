@@ -2,7 +2,7 @@ import { Projects } from "./Projects";
 import { Skills } from "./Skills";
 import { Educations } from "./Educations";
 import { Certificates } from "./Certificates";
-import { X, Download } from "lucide-react";
+import { X } from "lucide-react";
 
 interface QuadrantInterfaceProps {
   quadrantPosition: number;
@@ -37,20 +37,8 @@ export function QuadrantInterface({
         {/* Title */}
         <h2 className="text-xl font-bold text-gradient-purple">{field}</h2>
 
-        {/* Download CV Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            // TODO: Implement CV download
-          }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg accent-button transition-colors group"
-          aria-label="Download CV"
-        >
-          <Download className="w-4 h-4 accent-text accent-text-hover" />
-          <span className="text-sm accent-text accent-text-hover">
-            Download CV
-          </span>
-        </button>
+        {/* Right-side spacer to keep title centred */}
+        <div className="w-9" aria-hidden="true" />
       </div>
 
       {/* Content Area */}

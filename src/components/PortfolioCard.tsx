@@ -37,7 +37,7 @@ const highlightedProjects: HighlightedProject[] = [
   {
     title: "Chrona",
     icon: GitBranch,
-    link: " https://github.com/Capataina/Chrona",
+    link: "https://github.com/Capataina/Chrona",
     description:
       "A lightweight, high-performance git clone written as a learning project. Implements core git features with a focus on speed and efficiency using C++.",
   },
@@ -336,10 +336,10 @@ export function PortfolioCard({
               Hey, I'm Cap! 👋
             </motion.h1>
 
-            {/* CV Button - Right */}
+            {/* Resume Button - Right */}
             <motion.a
-              href="/cv/generic_cv.pdf"
-              download
+              href="/cv/Resume.pdf"
+              download="Resume - Ata Caner Cetinkaya.pdf"
               initial={cvButtonInitialVariants}
               animate={cvButtonAnimateVariants}
               transition={{ delay: 0.1, duration: 0.2 }}
@@ -348,7 +348,7 @@ export function PortfolioCard({
               className="px-3 py-1.5 text-white text-sm font-medium rounded-lg flex items-center gap-2 shadow-lg transition-all duration-200 cv-button"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Full Resume</span>
+              <span>Resume</span>
             </motion.a>
           </motion.div>
 

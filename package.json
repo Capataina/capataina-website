@@ -2,11 +2,19 @@
   "name": "capataina-website",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.0.9",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "analyze": "ANALYZE=true next build"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
