@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { Skill } from "./Skill";
+import type { Skill as SkillType } from "@/types";
 import { machineLearning } from "@/content/skills/machine-learning";
 import { webDevelopment } from "@/content/skills/web-development";
 import { desktopDevelopment } from "@/content/skills/desktop-development";
@@ -19,18 +20,18 @@ interface SkillsProps {
 }
 
 export const Skills = memo(function Skills({ field }: SkillsProps) {
-  const allSkills = [
+  const allSkills: SkillType[] = [
     machineLearning,
-    webDevelopment,
-    desktopDevelopment,
     systemsProgramming,
     networkingProtocols,
-    dataEngineering,
     compilerGPU,
+    desktopDevelopment,
     largeLanguageModels,
-    linuxDevOps,
-    cybersecurityNetworking,
     mathematicsOptimization,
+    dataEngineering,
+    cybersecurityNetworking,
+    linuxDevOps,
+    webDevelopment,
     gameDevelopment,
   ];
 
@@ -38,7 +39,9 @@ export const Skills = memo(function Skills({ field }: SkillsProps) {
   const skills = useMemo(
     () =>
       allSkills
-        .filter((skill) => skill.fields.includes(field))
+        .filter((skill) =>
+          skill.fields.includes(field as SkillType["fields"][number])
+        )
         .sort((a, b) => a.name.localeCompare(b.name)),
     [field]
   );

@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { Education } from "./Education";
+import type { Education as EducationType } from "@/types";
 import { universityOfYork } from "@/content/educations/university-of-york";
 
 interface EducationsProps {
@@ -7,13 +8,15 @@ interface EducationsProps {
 }
 
 export const Educations = memo(function Educations({ field }: EducationsProps) {
-  const allEducations = [universityOfYork];
+  const allEducations: EducationType[] = [universityOfYork];
 
   // Filter educations based on the field - memoized
   const educations = useMemo(
     () =>
       allEducations
-        .filter((education) => education.fields.includes(field))
+        .filter((education) =>
+          education.fields.includes(field as EducationType["fields"][number])
+        )
         .sort((a, b) => a.title.localeCompare(b.title)),
     [field]
   );

@@ -1,17 +1,18 @@
-// CME Group Trading and Finance Education
-export const cmeGroup = {
+import type { Certificate } from "@/types";
+
+export const cmeGroup: Certificate = {
   title: "CME Group Trading and Finance Education",
   fields: ["Low Level Financial Systems Engineer"],
   company: "CME Group",
   degrees: [
-    "Technical Analysis (Issued: November 2023)",
-    "Trading and Analysis (Issued: November 2023)",
-    "Using Fundamental Analysis When Evaluating Trades (Issued: November 2023)",
+    "Technical Analysis — November 2023",
+    "Trading and Analysis — November 2023",
+    "Using Fundamental Analysis When Evaluating Trades — November 2023",
   ],
   skills: [
     "Technical Analysis",
     "Fundamental Analysis",
-    "Strategic Thinking",
-    "Problem Solving",
+    "Market Structure",
+    "Trading Strategy",
   ],
 };

@@ -1,11 +1,17 @@
-// HackTheBox -- Dr. AITH Cybersecurity Training
-export const hackTheBox = {
-  title: "HackTheBox -- Dr. AITH Cybersecurity Training",
-  fields: ["Applied AI & ML Infrastructure Engineer"],
+import type { Certificate } from "@/types";
+
+export const hackTheBox: Certificate = {
+  title: "HackTheBox — Dr. AITH Cybersecurity Training",
+  fields: ["Systems & Infrastructure Engineer"],
   company: "HackTheBox",
   degrees: [
-    "Introduction to Malware Analysis (Issued: July 2025)",
-    "Linux Fundamentals (Issued: July 2025)",
+    "Introduction to Malware Analysis — July 2025",
+    "Linux Fundamentals — July 2025",
   ],
-  skills: ["Reverse Engineering", "Linux"],
+  skills: [
+    "Reverse Engineering",
+    "Malware Analysis",
+    "Linux Internals",
+    "Threat Hunting",
+  ],
 };

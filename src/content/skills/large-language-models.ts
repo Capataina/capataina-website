@@ -1,19 +1,25 @@
-export const largeLanguageModels = {
-  name: "Large Language Models",
+import type { Skill } from "@/types";
+
+export const largeLanguageModels: Skill = {
+  name: "Large Language Models & Agentic Systems",
   fields: ["Applied AI & ML Infrastructure Engineer"],
   subskills: [
-    "OpenRouter",
     "Anthropic Claude",
-    "Google Gemini",
+    "OpenRouter",
+    "Mistral",
     "OpenAI",
+    "Google Gemini",
     "Ollama",
+    "LangChain",
     "Prompt Engineering",
+    "Tool Use",
+    "Agentic Workflows",
   ],
   bulletPoints: [
-    "Multi-provider LLM orchestration with async execution patterns",
-    "Provider-agnostic architecture handling API differences and rate limits",
-    "Advanced prompt engineering and context management for debates and synthesis",
-    "Local model deployment and inference with Ollama",
-    "Semantic search and embedding generation for knowledge systems",
+    "Provider-agnostic multi-LLM debate orchestrator (Consilium) — same prompt across heterogeneous model APIs (OpenAI, Anthropic, Google, Ollama), structured per-round state emission, agreement / disagreement tracking",
+    "Production Claude-API integration in Cernio — per-job evaluation against a structured candidate profile, with reasoning preserved as an audit trail in WAL-mode SQLite",
+    "Adaptive AI tagging via Mistral Small 3.1 24B (Neuronika dissertation) — multi-layered tags from generalised to specific, prioritising pre-existing tags to prevent fragmentation as the note collection grows",
+    "Agentic skill ecosystem layered over Claude Code — 14 specialist skills covering job discovery (Cernio), vault upkeep (LifeOS), project extraction, code health audits, project research, and per-day Morning Brew synthesis",
+    "Local model deployment + inference via Ollama for offline-capable LLM-driven workflows where cloud calls aren't appropriate",
   ],
 };

@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
 import { Certificate } from "./Certificate";
+import type { Certificate as CertificateType } from "@/types";
 import { dataCamp } from "@/content/certificates/datacamp";
 import { deepLearningAI } from "@/content/certificates/deeplearning-ai";
 import { googleDeveloper } from "@/content/certificates/google-developer";
@@ -13,7 +14,7 @@ interface CertificatesProps {
 export const Certificates = memo(function Certificates({
   field,
 }: CertificatesProps) {
-  const allCertificates = [
+  const allCertificates: CertificateType[] = [
     dataCamp,
     deepLearningAI,
     googleDeveloper,
@@ -25,7 +26,9 @@ export const Certificates = memo(function Certificates({
   const certificates = useMemo(
     () =>
       allCertificates
-        .filter((certificate) => certificate.fields.includes(field))
+        .filter((certificate) =>
+          certificate.fields.includes(field as CertificateType["fields"][number])
+        )
         .sort((a, b) => a.title.localeCompare(b.title)),
     [field]
   );
