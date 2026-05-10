@@ -19,18 +19,18 @@ const STATUS_RANK: Record<ContributionType["status"], number> = {
   closed: 3,
 };
 
+const allContributions: ContributionType[] = [
+  burnAFine,
+  burnFold4d,
+  burnTensorContainerPanic,
+  tinygradOnnxLstm,
+  alloyJsonRpcRecursion,
+  gameMods,
+];
+
 export const Contributions = memo(function Contributions({
   field,
 }: ContributionsProps) {
-  const allContributions: ContributionType[] = [
-    burnAFine,
-    burnFold4d,
-    burnTensorContainerPanic,
-    tinygradOnnxLstm,
-    alloyJsonRpcRecursion,
-    gameMods,
-  ];
-
   const contributions = useMemo(
     () =>
       allContributions

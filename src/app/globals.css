@@ -204,13 +204,41 @@
   --accent-opensource-dim: oklch(0.5 0.08 65);
   --accent-opensource-glow: oklch(0.6 0.14 65 / 0.3);
 
-  /* Active accent color variables (will be updated dynamically) */
+  /* Active accent color variables — defaults at the root, overridden by
+     the `[data-quadrant-theme="..."]` rules below as the user hovers /
+     selects quadrants. The override approach replaced an earlier
+     useEffect + documentElement.style.setProperty per hover. */
   --accent-purple: var(--accent-default);
   --accent-purple-dim: var(--accent-default-dim);
   --accent-purple-glow: var(--accent-default-glow);
 
   /* Transition duration for accent color changes */
   --accent-transition-duration: 0.25s;
+}
+
+/* Per-theme accent overrides. Active when the page wrapper sets
+   `data-quadrant-theme` — the rules cascade to every descendant that
+   reads --accent-purple / -dim / -glow (gradients, glows, icon strokes).
+   The "default" attribute value falls through to the :root values above. */
+[data-quadrant-theme="systems"] {
+  --accent-purple: var(--accent-systems);
+  --accent-purple-dim: var(--accent-systems-dim);
+  --accent-purple-glow: var(--accent-systems-glow);
+}
+[data-quadrant-theme="ai"] {
+  --accent-purple: var(--accent-ai);
+  --accent-purple-dim: var(--accent-ai-dim);
+  --accent-purple-glow: var(--accent-ai-glow);
+}
+[data-quadrant-theme="finance"] {
+  --accent-purple: var(--accent-finance);
+  --accent-purple-dim: var(--accent-finance-dim);
+  --accent-purple-glow: var(--accent-finance-glow);
+}
+[data-quadrant-theme="opensource"] {
+  --accent-purple: var(--accent-opensource);
+  --accent-purple-dim: var(--accent-opensource-dim);
+  --accent-purple-glow: var(--accent-opensource-glow);
 }
 
 @layer base {

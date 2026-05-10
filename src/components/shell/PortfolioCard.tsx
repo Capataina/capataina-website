@@ -12,7 +12,7 @@ import {
   type LucideIcon,
   Terminal,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { memo, useMemo, useState } from "react";
 
 interface HighlightedProject {
   title: string;
@@ -64,7 +64,7 @@ interface PortfolioCardProps {
   selectedQuadrant: number | null;
 }
 
-export function PortfolioCard({
+export const PortfolioCard = memo(function PortfolioCard({
   hoveredQuadrant,
   selectedQuadrant,
 }: PortfolioCardProps) {
@@ -267,24 +267,23 @@ export function PortfolioCard({
     []
   );
 
-  // Calculate offset based on hovered quadrant (move in opposite direction)
-  const getOffset = () => {
-    const offset = "2.5%"; // 2.5% movement
+  // Offset opposite the hovered quadrant — memoized, only recomputes
+  // when hoveredQuadrant flips.
+  const offset = useMemo(() => {
     switch (hoveredQuadrant) {
-      case 1: // Top-left -> move bottom-right
-        return { x: offset, y: offset };
-      case 2: // Top-right -> move bottom-left
-        return { x: `-${offset}`, y: offset };
-      case 3: // Bottom-left -> move top-right
-        return { x: offset, y: `-${offset}` };
-      case 4: // Bottom-right -> move top-left
-        return { x: `-${offset}`, y: `-${offset}` };
+      case 1:
+        return { x: "2.5%", y: "2.5%" };
+      case 2:
+        return { x: "-2.5%", y: "2.5%" };
+      case 3:
+        return { x: "2.5%", y: "-2.5%" };
+      case 4:
+        return { x: "-2.5%", y: "-2.5%" };
       default:
         return { x: "0%", y: "0%" };
     }
-  };
+  }, [hoveredQuadrant]);
 
-  const offset = getOffset();
   const isVisible = selectedQuadrant === null;
 
   return (
@@ -445,4 +444,4 @@ export function PortfolioCard({
       </motion.div>
     </motion.div>
   );
-}
+});

@@ -7,9 +7,9 @@ interface EducationsProps {
   field: string;
 }
 
-export const Educations = memo(function Educations({ field }: EducationsProps) {
-  const allEducations: EducationType[] = [universityOfYork];
+const allEducations: EducationType[] = [universityOfYork];
 
+export const Educations = memo(function Educations({ field }: EducationsProps) {
   // Filter educations based on the field - memoized
   const educations = useMemo(
     () =>

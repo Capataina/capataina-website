@@ -11,17 +11,17 @@ interface CertificatesProps {
   field: string;
 }
 
+const allCertificates: CertificateType[] = [
+  dataCamp,
+  deepLearningAI,
+  googleDeveloper,
+  cmeGroup,
+  hackTheBox,
+];
+
 export const Certificates = memo(function Certificates({
   field,
 }: CertificatesProps) {
-  const allCertificates: CertificateType[] = [
-    dataCamp,
-    deepLearningAI,
-    googleDeveloper,
-    cmeGroup,
-    hackTheBox,
-  ];
-
   // Filter certificates based on the field - memoized
   const certificates = useMemo(
     () =>

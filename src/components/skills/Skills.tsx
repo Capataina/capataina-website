@@ -19,22 +19,22 @@ interface SkillsProps {
   field: string;
 }
 
-export const Skills = memo(function Skills({ field }: SkillsProps) {
-  const allSkills: SkillType[] = [
-    machineLearning,
-    systemsProgramming,
-    networkingProtocols,
-    compilerGPU,
-    desktopDevelopment,
-    largeLanguageModels,
-    mathematicsOptimization,
-    dataEngineering,
-    cybersecurityNetworking,
-    linuxDevOps,
-    webDevelopment,
-    gameDevelopment,
-  ];
+const allSkills: SkillType[] = [
+  machineLearning,
+  systemsProgramming,
+  networkingProtocols,
+  compilerGPU,
+  desktopDevelopment,
+  largeLanguageModels,
+  mathematicsOptimization,
+  dataEngineering,
+  cybersecurityNetworking,
+  linuxDevOps,
+  webDevelopment,
+  gameDevelopment,
+];
 
+export const Skills = memo(function Skills({ field }: SkillsProps) {
   // Filter skills based on the field - memoized
   const skills = useMemo(
     () =>

@@ -118,77 +118,113 @@ export function Quadrant({
     []
   );
 
-  // Memoize size calculation
+  // Size = a function of the (column, row) partitions L/R and T/B, where
+  // L+R = T+B = 100%. The selected quadrant fixes the partitions to 80/20;
+  // hover during selection nudges the partitions by 5% toward the hovered
+  // pane, so the small panes get a gentle hover response without breaking
+  // the L/R/T/B = 100% invariant.
   const size = useMemo(() => {
-    if (isSelected) {
-      return { width: "calc(80% - 16px)", height: "calc(80% - 16px)" };
-    }
-
-    if (selectedQuadrant !== null) {
-      const isTopRow = position <= 2;
-      const isLeftColumn = position % 2 === 1;
-      const selectedIsTopRow = selectedQuadrant! <= 2;
-      const selectedIsLeftColumn = selectedQuadrant! % 2 === 1;
-
-      const width =
-        selectedIsLeftColumn === isLeftColumn
-          ? "calc(80% - 16px)"
-          : "calc(20% - 16px)";
-      const height =
-        selectedIsTopRow === isTopRow ? "calc(80% - 16px)" : "calc(20% - 16px)";
-
-      return { width, height };
-    }
-
-    if (!isAnyHovered) {
-      return { width: "calc(50% - 16px)", height: "calc(50% - 16px)" };
-    }
-
-    if (isHovered) {
-      return { width: "calc(55% - 16px)", height: "calc(55% - 16px)" };
-    }
-
-    const isTopRow = position <= 2;
     const isLeftColumn = position % 2 === 1;
-    const hoveredIsTopRow = hoveredQuadrant! <= 2;
-    const hoveredIsLeftColumn = hoveredQuadrant! % 2 === 1;
+    const isTopRow = position <= 2;
 
-    const sharesSameRow = isTopRow === hoveredIsTopRow;
-    const sharesSameColumn = isLeftColumn === hoveredIsLeftColumn;
+    // No selection → original idle / hover layout.
+    if (selectedQuadrant === null) {
+      if (!isAnyHovered) {
+        return { width: "calc(50% - 16px)", height: "calc(50% - 16px)" };
+      }
+      if (isHovered) {
+        return { width: "calc(55% - 16px)", height: "calc(55% - 16px)" };
+      }
+      const hoveredIsTopRow = hoveredQuadrant! <= 2;
+      const hoveredIsLeftColumn = hoveredQuadrant! % 2 === 1;
+      const sharesSameRow = isTopRow === hoveredIsTopRow;
+      const sharesSameColumn = isLeftColumn === hoveredIsLeftColumn;
+      return {
+        width: sharesSameColumn ? "calc(55% - 16px)" : "calc(45% - 16px)",
+        height: sharesSameRow ? "calc(55% - 16px)" : "calc(45% - 16px)",
+      };
+    }
 
-    const width = sharesSameColumn ? "calc(55% - 16px)" : "calc(45% - 16px)";
-    const height = sharesSameRow ? "calc(55% - 16px)" : "calc(45% - 16px)";
+    // Selection mode — base partitions: 80% for the selected row/column,
+    // 20% for the other.
+    const selectedIsLeftColumn = selectedQuadrant! % 2 === 1;
+    const selectedIsTopRow = selectedQuadrant! <= 2;
+    let leftColW = selectedIsLeftColumn ? 80 : 20;
+    let rightColW = selectedIsLeftColumn ? 20 : 80;
+    let topRowH = selectedIsTopRow ? 80 : 20;
+    let bottomRowH = selectedIsTopRow ? 20 : 80;
 
-    return { width, height };
-  }, [
-    isSelected,
-    selectedQuadrant,
-    isAnyHovered,
-    isHovered,
-    position,
-    hoveredQuadrant,
-  ]);
+    // Hovering a non-selected pane during selection — nudge the partitions
+    // 5% toward the hovered pane. The selected pane shrinks by the same
+    // amount so L+R and T+B stay at 100%.
+    if (hoveredQuadrant !== null && hoveredQuadrant !== selectedQuadrant) {
+      const hoveredIsLeftColumn = hoveredQuadrant % 2 === 1;
+      const hoveredIsTopRow = hoveredQuadrant <= 2;
+      const NUDGE = 5;
+
+      if (hoveredIsLeftColumn !== selectedIsLeftColumn) {
+        if (hoveredIsLeftColumn) {
+          leftColW += NUDGE;
+          rightColW -= NUDGE;
+        } else {
+          leftColW -= NUDGE;
+          rightColW += NUDGE;
+        }
+      }
+      if (hoveredIsTopRow !== selectedIsTopRow) {
+        if (hoveredIsTopRow) {
+          topRowH += NUDGE;
+          bottomRowH -= NUDGE;
+        } else {
+          topRowH -= NUDGE;
+          bottomRowH += NUDGE;
+        }
+      }
+    }
+
+    const widthPct = isLeftColumn ? leftColW : rightColW;
+    const heightPct = isTopRow ? topRowH : bottomRowH;
+    return {
+      width: `calc(${widthPct}% - 16px)`,
+      height: `calc(${heightPct}% - 16px)`,
+    };
+  }, [position, selectedQuadrant, hoveredQuadrant, isAnyHovered, isHovered]);
+
+  const isActive = isHovered || isSelected;
+
+  // Memoize the inline style object so referential equality holds across
+  // renders that don't change `isActive`. Saves React's style-prop diff.
+  const quadrantStyle = useMemo(
+    () => ({
+      background: isActive
+        ? "hsla(285, 10%, 18%, 0.10)"
+        : "hsla(285, 8%, 16%, 0.06)",
+      backdropFilter: "blur(2px)",
+      WebkitBackdropFilter: "blur(2px)",
+      contain: "layout style paint" as const,
+    }),
+    [isActive]
+  );
+
+  // Memoize the animate target so Motion can short-circuit when the
+  // size + shadow tuple is unchanged across renders.
+  const quadrantAnimate = useMemo(
+    () => ({
+      width: size.width,
+      height: size.height,
+      boxShadow: isActive
+        ? "0 4px 16px -2px rgba(0, 0, 0, 0.4)"
+        : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
+    }),
+    [size.width, size.height, isActive]
+  );
 
   return (
     <motion.div
       ref={quadrantRef}
       className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300 select-none"
-      style={{
-        background:
-          isHovered || isSelected ? "hsl(285, 10%, 18%)" : "hsl(285, 8%, 16%)",
-        // CSS containment: hover / select state changes only invalidate this
-        // subtree's layout / style / paint, not the rest of the document.
-        // Pure perf win, zero visual change.
-        contain: "layout style paint",
-      }}
-      animate={{
-        width: size.width,
-        height: size.height,
-        boxShadow:
-          isHovered || isSelected
-            ? "0 4px 16px -2px rgba(0, 0, 0, 0.4)"
-            : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
-      }}
+      style={quadrantStyle}
+      animate={quadrantAnimate}
       transition={quadrantTransition}
       onMouseEnter={() => !isSelected && onHoverChange(position)}
       onMouseLeave={() => !isSelected && onHoverChange(null)}

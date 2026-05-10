@@ -49,6 +49,7 @@ export function QuadrantInterface({
           className="w-[70%] h-full rounded-lg p-4 relative card-glow overflow-y-auto"
           style={{
             background: "hsla(285, 8%, 19%, 0.6)",
+            contain: "content",
           }}
         >
           <div className="space-y-4 divide-y divide-zinc-700/60 [&>*]:pt-4 [&>*:first-child]:pt-0">
@@ -64,6 +65,7 @@ export function QuadrantInterface({
           className="w-[30%] h-full rounded-lg p-4 card-glow overflow-y-auto"
           style={{
             background: "hsla(285, 8%, 19%, 0.6)",
+            contain: "content",
           }}
         >
           <Skills field={field} />

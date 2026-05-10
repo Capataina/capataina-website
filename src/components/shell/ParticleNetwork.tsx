@@ -10,10 +10,6 @@ interface Particle {
   radius: number;
 }
 
-interface Grid {
-  [key: string]: Particle[];
-}
-
 export function ParticleNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -38,10 +34,9 @@ export function ParticleNetwork() {
       canvas.height = window.innerHeight;
     };
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas, { passive: true });
 
-    // Initialize particles (reduced from 80 to 40 for performance)
-    const particleCount = 240;
+    const particleCount = 320;
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
@@ -55,32 +50,28 @@ export function ParticleNetwork() {
     }
     particlesRef.current = particles;
 
-    // Grid-based spatial partitioning for O(n) complexity
-    const cellSize = 120; // Match maxDistance for connection drawing
-    const getGridKey = (x: number, y: number) => {
-      const col = Math.floor(x / cellSize);
-      const row = Math.floor(y / cellSize);
-      return `${col},${row}`;
-    };
+    // Hoisted constants — physics tuning. Moved out of the per-particle body
+    // so they're not redeclared 320× per frame.
+    const cellSize = 120; // Matches maxDistance so a 3×3 cell scan is sufficient.
+    const repulsionRadius = 80;
+    const repulsionRadiusSquared = repulsionRadius * repulsionRadius;
+    const maxDistance = 120;
+    const maxDistanceSquared = maxDistance * maxDistance;
+    const minDistance = 450; // Mouse repulsion radius.
+    const minDistanceSquared = minDistance * minDistance;
+    const fillStyle = "rgba(168, 150, 200, 0.6)";
+    const TWO_PI = Math.PI * 2;
 
-    const getNeighborCells = (x: number, y: number): string[] => {
-      const col = Math.floor(x / cellSize);
-      const row = Math.floor(y / cellSize);
-      const neighbors: string[] = [];
-
-      for (let i = -1; i <= 1; i++) {
-        for (let j = -1; j <= 1; j++) {
-          neighbors.push(`${col + i},${row + j}`);
-        }
-      }
-      return neighbors;
-    };
+    // Grid is allocated once and cleared each frame. Map outperforms a plain
+    // object for this access pattern (lots of dynamic keys, frequent clear).
+    const grid = new Map<string, Particle[]>();
 
     // Mouse tracking
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
     };
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
     // Animation loop
     const animate = () => {
@@ -90,133 +81,133 @@ export function ParticleNetwork() {
         animationRef.current = undefined;
         return;
       }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cw = canvas.width;
+      const chh = canvas.height;
+      const centerX = cw / 2;
+      const centerY = chh / 2;
+      const maxDistanceFromCenter = Math.sqrt(
+        centerX * centerX + centerY * centerY
+      );
+      const mouseX = mouseRef.current.x;
+      const mouseY = mouseRef.current.y;
+      const particleLen = particles.length;
+
+      ctx.clearRect(0, 0, cw, chh);
 
       // Build spatial grid for this frame
-      const grid: Grid = {};
-      particles.forEach((particle) => {
-        const key = getGridKey(particle.x, particle.y);
-        if (!grid[key]) grid[key] = [];
-        grid[key].push(particle);
-      });
+      grid.clear();
+      for (let i = 0; i < particleLen; i++) {
+        const p = particles[i];
+        const key = `${Math.floor(p.x / cellSize)},${Math.floor(
+          p.y / cellSize
+        )}`;
+        const cellList = grid.get(key);
+        if (cellList) {
+          cellList.push(p);
+        } else {
+          grid.set(key, [p]);
+        }
+      }
 
-      particles.forEach((particle) => {
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i < particleLen; i++) {
+        const particle = particles[i];
+
         // Update position
         particle.x += particle.vx;
         particle.y += particle.vy;
 
         // Wrap around screen edges like asteroids
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-        if (particle.y > canvas.height) particle.y = 0;
+        if (particle.x < 0) particle.x = cw;
+        else if (particle.x > cw) particle.x = 0;
+        if (particle.y < 0) particle.y = chh;
+        else if (particle.y > chh) particle.y = 0;
 
-        // Add random drift to keep particles moving
+        // Random drift to keep particles moving
         particle.vx += (Math.random() - 0.5) * 0.05;
         particle.vy += (Math.random() - 0.5) * 0.05;
 
-        // Gentle center attraction to prevent clustering at edges
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
+        // Gentle center attraction to prevent edge clustering
         const toCenterX = centerX - particle.x;
         const toCenterY = centerY - particle.y;
         const distanceToCenter = Math.sqrt(
           toCenterX * toCenterX + toCenterY * toCenterY
         );
-        const maxDistanceFromCenter = Math.sqrt(
-          centerX * centerX + centerY * centerY
-        );
-
-        // Stronger pull the further from center
-        const centerPullStrength =
-          (distanceToCenter / maxDistanceFromCenter) * 0.015;
         if (distanceToCenter > 0) {
+          const centerPullStrength =
+            (distanceToCenter / maxDistanceFromCenter) * 0.015;
           particle.vx += (toCenterX / distanceToCenter) * centerPullStrength;
           particle.vy += (toCenterY / distanceToCenter) * centerPullStrength;
         }
 
-        // Gentle particle repulsion - large radius, low strength
-        const repulsionNeighbors = getNeighborCells(particle.x, particle.y);
-        const repulsionRadius = 80;
-        const repulsionRadiusSquared = repulsionRadius * repulsionRadius;
+        // Particle repulsion + connection drawing — single 3×3 neighbor walk.
+        // Both operations need the same neighbor lookup; merging them halves
+        // the cell scans and computes Math.sqrt at most once per pair.
+        const col = Math.floor(particle.x / cellSize);
+        const row = Math.floor(particle.y / cellSize);
+        for (let dc = -1; dc <= 1; dc++) {
+          for (let dr = -1; dr <= 1; dr++) {
+            const cellList = grid.get(`${col + dc},${row + dr}`);
+            if (!cellList) continue;
+            const cellLen = cellList.length;
+            for (let n = 0; n < cellLen; n++) {
+              const otherParticle = cellList[n];
+              if (particle === otherParticle) continue;
+              const pdx = particle.x - otherParticle.x;
+              const pdy = particle.y - otherParticle.y;
+              const pDistanceSquared = pdx * pdx + pdy * pdy;
 
-        repulsionNeighbors.forEach((key) => {
-          const neighbors = grid[key];
-          if (!neighbors) return;
+              // Outer gate: connection radius (120) is the larger of the two.
+              if (pDistanceSquared >= maxDistanceSquared) continue;
 
-          neighbors.forEach((otherParticle) => {
-            if (particle === otherParticle) return;
-
-            const pdx = particle.x - otherParticle.x;
-            const pdy = particle.y - otherParticle.y;
-            const pDistanceSquared = pdx * pdx + pdy * pdy;
-
-            if (
-              pDistanceSquared < repulsionRadiusSquared &&
-              pDistanceSquared > 0
-            ) {
               const pDistance = Math.sqrt(pDistanceSquared);
-              const force =
-                ((repulsionRadius - pDistance) / repulsionRadius) * 0.02; // Low strength
-              particle.vx += (pdx / pDistance) * force;
-              particle.vy += (pdy / pDistance) * force;
-            }
-          });
-        });
 
-        // Mouse repulsion - bigger radius, lower strength
-        const mdx = mouseRef.current.x - particle.x;
-        const mdy = mouseRef.current.y - particle.y;
-        const mDistanceSquared = mdx * mdx + mdy * mdy;
-        const minDistance = 450; // Increased from 150
-        const minDistanceSquared = minDistance * minDistance;
+              // Repulsion only fires within the smaller radius (80).
+              if (pDistance > 0 && pDistance < repulsionRadius) {
+                const force =
+                  ((repulsionRadius - pDistance) / repulsionRadius) * 0.02;
+                particle.vx += (pdx / pDistance) * force;
+                particle.vy += (pdy / pDistance) * force;
+              }
 
-        if (mDistanceSquared < minDistanceSquared) {
-          const mDistance = Math.sqrt(mDistanceSquared);
-          const force = (minDistance - mDistance) / minDistance;
-          particle.vx -= (mdx / mDistance) * force * 0.5; // Reduced from 0.5
-          particle.vy -= (mdy / mDistance) * force * 0.5;
-        }
-
-        // Gentle friction to prevent extreme speeds
-        particle.vx *= 0.99; // Less friction
-        particle.vy *= 0.99;
-
-        // Draw connections only to nearby particles using grid
-        const neighborKeys = getNeighborCells(particle.x, particle.y);
-        const maxDistance = 120;
-        const maxDistanceSquared = maxDistance * maxDistance;
-
-        neighborKeys.forEach((key) => {
-          const neighbors = grid[key];
-          if (!neighbors) return;
-
-          neighbors.forEach((otherParticle) => {
-            if (particle === otherParticle) return;
-
-            const dx = particle.x - otherParticle.x;
-            const dy = particle.y - otherParticle.y;
-            const distanceSquared = dx * dx + dy * dy;
-
-            if (distanceSquared < maxDistanceSquared) {
-              const distance = Math.sqrt(distanceSquared);
-              const opacity = (1 - distance / maxDistance) * 0.3;
+              // Connection draw — same line was drawn by both A→B and B→A
+              // in the original code; preserved here so opacity composites
+              // identically.
+              const opacity = (1 - pDistance / maxDistance) * 0.3;
               ctx.strokeStyle = `rgba(168, 150, 200, ${opacity})`;
-              ctx.lineWidth = 1;
               ctx.beginPath();
               ctx.moveTo(particle.x, particle.y);
               ctx.lineTo(otherParticle.x, otherParticle.y);
               ctx.stroke();
             }
-          });
-        });
+          }
+        }
+
+        // Mouse repulsion
+        const mdx = mouseX - particle.x;
+        const mdy = mouseY - particle.y;
+        const mDistanceSquared = mdx * mdx + mdy * mdy;
+        if (mDistanceSquared < minDistanceSquared) {
+          const mDistance = Math.sqrt(mDistanceSquared);
+          if (mDistance > 0) {
+            const force = (minDistance - mDistance) / minDistance;
+            particle.vx -= (mdx / mDistance) * force * 0.5;
+            particle.vy -= (mdy / mDistance) * force * 0.5;
+          }
+        }
+
+        // Gentle friction to prevent extreme speeds
+        particle.vx *= 0.99;
+        particle.vy *= 0.99;
 
         // Draw particle
-        ctx.fillStyle = "rgba(168, 150, 200, 0.6)";
+        ctx.fillStyle = fillStyle;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, particle.radius, 0, TWO_PI);
         ctx.fill();
-      });
+      }
 
       animationRef.current = requestAnimationFrame(animate);
     };

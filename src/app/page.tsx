@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { Quadrant } from "@/components/shell/Quadrant";
 import { PortfolioCard } from "@/components/shell/PortfolioCard";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 // Code-split the canvas-heavy ParticleNetwork component — its physics +
 // rAF loop don't need to be in the initial bundle. ssr:false because the
@@ -28,34 +28,14 @@ export default function Home() {
   const [hoveredQuadrant, setHoveredQuadrant] = useState<number | null>(null);
   const [selectedQuadrant, setSelectedQuadrant] = useState<number | null>(null);
 
-  // Update CSS variables based on active quadrant
-  useEffect(() => {
-    const root = document.documentElement;
-    const activeQuadrant = selectedQuadrant || hoveredQuadrant;
-    const theme = activeQuadrant ? positionToTheme[activeQuadrant] : "default";
-
-    if (theme === "default") {
-      root.style.setProperty("--accent-purple", "var(--accent-default)");
-      root.style.setProperty(
-        "--accent-purple-dim",
-        "var(--accent-default-dim)"
-      );
-      root.style.setProperty(
-        "--accent-purple-glow",
-        "var(--accent-default-glow)"
-      );
-    } else {
-      root.style.setProperty("--accent-purple", `var(--accent-${theme})`);
-      root.style.setProperty(
-        "--accent-purple-dim",
-        `var(--accent-${theme}-dim)`
-      );
-      root.style.setProperty(
-        "--accent-purple-glow",
-        `var(--accent-${theme}-glow)`
-      );
-    }
-  }, [hoveredQuadrant, selectedQuadrant]);
+  // Theme is derived synchronously from state and applied via the
+  // `data-quadrant-theme` attribute below; the CSS rules in globals.css
+  // override the accent vars per theme. This avoids a post-commit
+  // useEffect + setProperty call on every hover.
+  const activeQuadrant = selectedQuadrant ?? hoveredQuadrant;
+  const theme: QuadrantTheme = activeQuadrant
+    ? positionToTheme[activeQuadrant]
+    : "default";
 
   const handleBackgroundClick = () => {
     setSelectedQuadrant(null);
@@ -63,6 +43,7 @@ export default function Home() {
 
   return (
     <div
+      data-quadrant-theme={theme}
       className="h-screen w-screen flex flex-wrap gradient-bg p-2 relative overflow-hidden"
       style={{ perspective: 1000 }}
       onClick={handleBackgroundClick}

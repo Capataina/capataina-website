@@ -21,25 +21,25 @@ interface ProjectsProps {
   field: string;
 }
 
-export const Projects = memo(function Projects({ field }: ProjectsProps) {
-  const allProjects: ProjectType[] = [
-    aurix,
-    cernio,
-    neurodrive,
-    imageBrowser,
-    nyquestro,
-    tectra,
-    neuronika,
-    vynapse,
-    xyntra,
-    zyphos,
-    chrona,
-    consilium,
-    asteroidsAI,
-    fraudDetection,
-    personalWebsite,
-  ];
+const allProjects: ProjectType[] = [
+  aurix,
+  cernio,
+  neurodrive,
+  imageBrowser,
+  nyquestro,
+  tectra,
+  neuronika,
+  vynapse,
+  xyntra,
+  zyphos,
+  chrona,
+  consilium,
+  asteroidsAI,
+  fraudDetection,
+  personalWebsite,
+];
 
+export const Projects = memo(function Projects({ field }: ProjectsProps) {
   // Filter projects based on the field - memoized.
   // Featured projects float to the top; remaining sorted alphabetically.
   const projects = useMemo(
