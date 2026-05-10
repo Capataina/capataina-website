@@ -1,267 +1,214 @@
-*Captured 2026-05-10 against the pre-restructure flat `src/` layout. A major restructure (file reorganisation + content rewrite + 4th-quadrant replacement) is imminent in the same session — both files will be regenerated post-restructure.*
-
 # Architecture
 
-## Purpose
+*Captured 2026-05-10 post-restructure. Replaces the pre-restructure baseline that was captured earlier the same day under the flat-src layout.*
 
-Single-page interactive personal portfolio for Ata Caner Cetinkaya ("Capataina"). The site presents Caner across four engineering identities through a 2x2 quadrant grid; clicking a quadrant expands it into a full-screen "interface" panel showing the projects, education, certificates, and skills tagged for that identity. Deployed at https://capataina.vercel.app.
+## Scope / Purpose
 
-The site is a single route (`/`) — there is no per-project sub-page, no blog, no sub-navigation. All content lives in TypeScript data modules, filtered into the active quadrant by string-matching against a `fields: string[]` tag on each item.
+Personal portfolio website at [capataina.vercel.app](https://capataina.vercel.app). Single static route. The page renders a 4-quadrant interactive shell — each quadrant carrying one of Caner's engineering identities (Systems / AI / Finance / Open Source). Hovering a quadrant nudges the floating PortfolioCard card; clicking a quadrant expands it to ~80% of the viewport and reveals the field-filtered set of educations + projects + open-source contributions + certificates on the left, and skills on the right.
 
-## Stack
+The repo is a portfolio + design sandbox, not a product. The site values visual richness (animations, particles, quadrant springs) and the discipline that lets that richness ship cheaply (memoisation, code-splitting, IntersectionObserver pause, CSS containment).
 
-| Layer | Choice | Notes |
-|-------|--------|-------|
-| Framework | Next.js `16.0.10` (App Router) | `package.json` line 18; `src/app/` only |
-| React | `19.2.1` | concurrent features available; no use of Server Components beyond layout (page is `"use client"`) |
-| Language | TypeScript 5 (strict) | `tsconfig.json` line 7; `paths: { "@/*": ["./src/*"] }` |
-| Styling | Tailwind CSS v4 + custom CSS variables | `@import "tailwindcss"` + `@theme inline { ... }` in `src/app/globals.css` |
-| UI primitives | shadcn/ui (`new-york` style, `neutral` base) | `components.json`; only `Accordion` and `Badge` installed under `src/components/ui/` |
-| Animation | `motion/react` (Framer Motion v12) | named `motion` in `package.json`; `motion`, `AnimatePresence`, `whileHover`, `layout` |
-| Icons | `lucide-react` | quadrant icons (`Cpu`, `Brain`, `Database`, `Code`), action icons (`Download`, `X`, `Github`, `Linkedin`, `ExternalLink`) |
-| Fonts | Local Satoshi Variable | `src/app/layout.tsx` lines 5-15; served from `public/fonts/Satoshi-Variable.woff2`, exposed as `--font-satoshi` |
-| Utility | `clsx` + `tailwind-merge` via `cn` helper | `src/lib/utils.ts` |
-| Package manager | pnpm (workspace file present) + npm lockfile lingering | both `pnpm-lock.yaml` and `package-lock.json` in tree; `pnpm-workspace.yaml` declares build-script policies for `sharp` / `unrs-resolver` |
-| Deployment | Vercel | per `README.md` |
+## Repository Overview
 
-`next.config.ts` is empty default — no image domains, redirects, headers, or experimental flags configured.
+- **Stack:** Next.js 16 (App Router, Turbopack), React 19, TypeScript 5 strict, Tailwind 4, shadcn/ui (Radix primitives), `motion/react` (formerly Framer Motion), pnpm.
+- **Build target:** static prerendered output. No API routes, no runtime server, no backend.
+- **Deploy target:** Vercel via push-to-`master`.
+- **Source-of-truth invariant:** the `Field` discriminated union in `src/types/field.ts` defines the four quadrant labels. Every content module's `fields` array references one or more of those exact strings. Compile-time enforcement.
 
-## Routing — Next App Router shape
+## Repository Structure
 
-```
-src/app/
-├── layout.tsx     # RootLayout: <html lang="en" className="dark"> + Satoshi font + metadata
-├── page.tsx       # Single client-side route ("/") — quadrant grid host
-└── globals.css    # Tailwind theme + dark-mode tokens + accent-color variables + utility classes
-```
-
-- `metadata.title = "Capataina Portfolio"`, `metadata.description = "Portfolio website of Capataina"` (`layout.tsx` lines 17-20).
-- `<html>` is hard-coded `className="dark"` — no light-mode toggle; everything in `globals.css` `:root` is effectively dead. All real tokens live under `.dark { ... }` (lines 148-214).
-- `page.tsx` is `"use client"`; the entire site is a client component tree under `<AccentColorProvider>`.
-
-## Top-level repository structure (current flat src/)
-
-```
+```text
 capataina-website/
-├── CLAUDE.md                  # principal-engineering personality (project-checked, 43 KB)
-├── README.md                  # one-line pointer to the deployed site
-├── components.json            # shadcn config
-├── next.config.ts             # empty default
-├── eslint.config.mjs          # next/core-web-vitals + next/typescript flat config
-├── postcss.config.mjs         # @tailwindcss/postcss only
-├── package.json
-├── package-lock.json          # npm lockfile (legacy — coexists with pnpm-lock.yaml)
-├── pnpm-lock.yaml
-├── pnpm-workspace.yaml
-├── tsconfig.json              # @/* → ./src/*
+├── CLAUDE.md                   # 4.3 KB project-local Claude guidance — hard
+│                               # constraints + folder convention + gotchas.
+│                               # Layered on top of the global ~/.claude/CLAUDE.md
+│                               # principal-engineering personality.
+├── README.md                   # ~5.7 KB project description, run instructions,
+│                               # adding-content walkthrough, theming model
+├── context/                    # implementation memory — this file + notes.md
 ├── public/
-│   ├── cv/generic_cv.pdf      # served at /cv/generic_cv.pdf, linked from PortfolioCard
-│   └── fonts/Satoshi-Variable.woff2  (+ unzipped satoshi/ + satoshi.zip)
-└── src/
-    ├── app/                   # Next routes (3 files)
-    ├── components/            # 12 feature components + ui/ shadcn primitives
-    ├── components/ui/         # accordion.tsx, badge.tsx (shadcn-generated; do not author by hand)
-    ├── contexts/              # AccentColorContext.tsx
-    ├── lib/                   # utils.ts (cn helper)
-    ├── projects/              # 12 project data modules
-    ├── skills/                # 12 skill data modules
-    ├── educations/            # 1 education data module
-    └── certificates/          # 5 certificate data modules
+│   ├── cv/Resume.pdf           # served at /cv/Resume.pdf — the Resume button target
+│   └── fonts/                  # Satoshi-Variable.woff2 (loaded via next/font/local)
+├── src/
+│   ├── app/                    # Next App Router (page.tsx, layout.tsx, globals.css)
+│   ├── components/
+│   │   ├── ui/                 # shadcn primitives (accordion, badge) — leave alone
+│   │   ├── shell/              # PortfolioCard, Quadrant, QuadrantInterface, ParticleNetwork
+│   │   ├── projects/           # Project (single card) + Projects (filtered list)
+│   │   ├── skills/             # Skill + Skills
+│   │   ├── educations/         # Education + Educations
+│   │   ├── certificates/       # Certificate + Certificates
+│   │   └── open-source/        # Contribution + Contributions
+│   ├── content/                # typed data modules — one .ts per entry
+│   │   ├── projects/           # 15 entries (Aurix, Cernio, NeuroDrive, Image
+│   │   │                       #   Browser, Nyquestro, Tectra, Neuronika,
+│   │   │                       #   Vynapse, Xyntra, Zyphos, Chrona, Consilium,
+│   │   │                       #   AsteroidsAI, fraud-detection, personal-website)
+│   │   ├── skills/             # 12 entries
+│   │   ├── educations/         # 1 entry (University of York)
+│   │   ├── certificates/       # 5 entries (CME Group, DataCamp, DeepLearning.AI,
+│   │   │                       #   Google Developer, HackTheBox)
+│   │   └── open-source/        # 6 entries (burn A-FINE, burn fold4d, burn
+│   │                           #   TensorContainer, tinygrad LSTM, alloy
+│   │                           #   JSON-RPC, game mods)
+│   ├── types/                  # canonical shapes — Field union + 5 entry types
+│   └── lib/utils.ts            # cn() utility from shadcn
+├── next.config.ts              # optimizePackageImports for lucide + motion +
+│                               #   bundle-analyzer wiring
+├── pnpm-workspace.yaml         # allowBuilds: sharp + unrs-resolver (pnpm 11
+│                               #   approval gate — without this, install exits 1)
+├── package.json                # packageManager: pnpm@11.0.9 + pnpm.onlyBuiltDeps
+├── pnpm-lock.yaml
+├── tsconfig.json               # strict, paths: { @/* : ./src/* }
+├── eslint.config.mjs           # eslint-config-next
+├── postcss.config.mjs
+├── components.json             # shadcn config
+└── .gitignore
 ```
 
-The flat-folder pattern is the central convention: every content type has its own sibling directory under `src/`, every entry is a single `.ts` file exporting one named const, and the rendering component imports each entry by name.
+## Subsystem Responsibilities
 
-## Quadrant interaction model
+| Subsystem | Lives at | Owns | Stability |
+|-----------|----------|------|-----------|
+| **App shell** | `src/app/` | Next App Router entry, root layout, global CSS, font loading via `next/font/local`, runtime accent-CSS-variable swap on `documentElement` | stable |
+| **Shell components** | `src/components/shell/` | The interactive surface: 4 quadrants, the floating PortfolioCard, the canvas ParticleNetwork background, the QuadrantInterface mounted on selection. The dense interaction logic (state machine, layout choreography, accent CSS swap) is the project's central subsystem and has its own canonical home at [`systems/quadrant-interaction.md`](systems/quadrant-interaction.md). | stable |
+| **Content components** | `src/components/{projects,skills,educations,certificates,open-source}/` | One pair per content domain: a single-card component (`Project`, `Skill`, etc.) and a filtered-list component (`Projects`, `Skills`, etc.) that imports the data modules and field-filters them | stable |
+| **Content data layer** | `src/content/` | Typed `.ts` modules — one per entry. The list components import these directly. No CMS, no API — content lives in the source tree under TypeScript type-checking | unstable (changes whenever a new project / skill / contribution lands) |
+| **Type layer** | `src/types/` | Canonical shapes: `Field` discriminated union, `Project`, `Skill`, `Education`, `Certificate`, `Contribution`. Every content module is annotated against these | stable |
+| **shadcn primitives** | `src/components/ui/` | Radix-derived `Accordion` + `Badge`. Used by every list component for collapsible details + tag pills | stable (framework-supplied, do not edit) |
 
-Three orthogonal interaction states, all driven from `src/app/page.tsx`:
-
-```
-state space        ┌─ hoveredQuadrant: 1 | 2 | 3 | 4 | null
-                   ├─ selectedQuadrant: 1 | 2 | 3 | 4 | null
-                   └─ activeQuadrant = selectedQuadrant ?? hoveredQuadrant
-```
-
-**Layout response** (computed in `Quadrant.tsx` lines 143-191, memoised):
-
-| Condition | Self size | Other quadrants |
-|-----------|-----------|-----------------|
-| Nothing hovered, nothing selected | 50% × 50% | 50% × 50% |
-| `isHovered` (this quadrant) | 55% × 55% | sibling sharing row/col gets 55% on shared axis, others 45% |
-| Some other quadrant hovered | shrinks to 45% on the non-shared axis | hovered one expands |
-| `isSelected` (this quadrant) | 80% × 80% | each squashed to 80%/20% according to whether they share the selected one's row or column |
-| Some other quadrant selected | 20% on non-shared axis, 80% on shared axis | selected one fills 80% × 80% |
-
-Spring transition: `{ stiffness: 500, damping: 25 }` (`Quadrant.tsx` lines 45-52).
-
-**Visual content per state**:
+## Dependency Direction
 
 ```
-isSelected → <QuadrantInterface />          (full panel: header bar + content area)
-isAnyOtherSelected → <Icon />               (Lucide icon for this quadrant's role)
-default → <h2>{label}</h2>                  (text-gradient-purple title)
+                     ┌───────────────────┐
+                     │  src/app/page.tsx │
+                     │  (single route)   │
+                     └─────────┬─────────┘
+                               │
+         ┌─────────────────────┼─────────────────────┐
+         │                     │                     │
+         ▼                     ▼                     ▼
+ ┌───────────────┐   ┌───────────────┐    ┌────────────────────┐
+ │ ParticleNet   │   │ PortfolioCard │    │ Quadrant ×4        │
+ │ (canvas back- │   │ (floating)    │    │ (interactive grid) │
+ │  ground)      │   └───────────────┘    └──────────┬─────────┘
+ └───────────────┘                                   │ on select
+                                                     ▼
+                                          ┌──────────────────────┐
+                                          │ QuadrantInterface    │
+                                          │ (mounted in selected │
+                                          │  quadrant)           │
+                                          └──────────┬───────────┘
+                                                     │ field-filtered
+            ┌────────────────────┬───────────────────┼──────────────────┬───────────────────┐
+            ▼                    ▼                   ▼                  ▼                   ▼
+      ┌──────────┐         ┌──────────┐        ┌──────────────┐    ┌──────────┐      ┌────────────┐
+      │ Educations│         │ Projects │        │ Contributions│    │ Skills   │      │Certificates│
+      └─────┬────┘         └────┬─────┘        └──────┬───────┘    └────┬─────┘      └─────┬──────┘
+            │ imports           │ imports             │ imports         │ imports          │ imports
+            ▼                   ▼                     ▼                 ▼                  ▼
+       content/            content/             content/           content/           content/
+       educations/         projects/            open-source/       skills/            certificates/
+       *.ts                *.ts                 *.ts               *.ts               *.ts
 ```
 
-`AnimatePresence mode="popLayout"` wraps the swap (`Quadrant.tsx` line 218) so the icon/label/interface cross-fade in place rather than reflowing the parent.
+Direction is one-way: app shell → shell components → list components → typed content modules → types. Nothing in `content/` or `types/` imports anything from `components/` or `app/`. The types layer is the only thing imported by every other layer.
 
-**Quadrant-position → role mapping** (hard-coded; `page.tsx` lines 13-18 + `Quadrant.tsx` lines 9-14):
+## Core Execution / Data Flow
 
-| Position | Theme key | Lucide icon | Label |
-|----------|-----------|-------------|-------|
-| 1 (top-left) | `systems` | `Cpu` | "Systems & Infrastructure Engineer" |
-| 2 (top-right) | `ai` | `Brain` | "Applied AI & ML Infrastructure Engineer" |
-| 3 (bottom-left) | `finance` | `Database` | "Low Level Financial Systems Engineer" |
-| 4 (bottom-right) | `fullstack` | `Code` | "Product & Full Stack Engineer" |
+**Initial render (cold load):**
 
-The `field` value passed down to `Projects` / `Skills` / `Educations` / `Certificates` is the **label string** (not the theme key), and that exact string is what each data module's `fields: string[]` is matched against.
+1. Browser requests `/`. Vercel serves the prerendered HTML from `pnpm build`.
+2. Hydration kicks in. `app/page.tsx` runs as a client component (`"use client"`).
+3. `ParticleNetwork` is `dynamic()`-imported with `ssr: false`, so it's split into its own chunk and loaded after the initial paint. The canvas physics + grid + animation loop lives entirely browser-side.
+4. `PortfolioCard` mounts and starts the floating-y bounce loop (skipped when `useReducedMotion()` reports true).
+5. Four `Quadrant` components mount with their static `label` props passed from `page.tsx`. Each quadrant's outer `motion.div` carries `contain: layout style paint` so its hover / select state changes don't ripple paint passes outside its subtree.
+6. The default accent CSS variables (`--accent-default-*`) are active. Page is interactive.
 
-## Data layer (flat-folder per-content-type)
+**Quadrant hover (no selection):**
 
-Every content type follows the same shape:
+1. User mouse enters quadrant N. `Quadrant.tsx` calls `onHoverChange(N)` from props.
+2. `page.tsx` updates `hoveredQuadrant` state.
+3. `useEffect` in `page.tsx` fires: it computes `theme = positionToTheme[hoveredQuadrant]` (one of `"systems" | "ai" | "finance" | "opensource"`) and writes `var(--accent-${theme})` to `document.documentElement.style` for `--accent-purple`, `--accent-purple-dim`, `--accent-purple-glow`.
+4. CSS cascade fires. Every `text-gradient-purple`, `accent-text`, `accent-button`, `icon-gradient` class on the page interpolates to the new accent over `--accent-transition-duration`. The `PortfolioCard` also offsets (~2.5%) opposite to the hovered quadrant for a parallax effect.
+5. Sibling quadrants resize to give the hovered one ~55% width/height; the rest tighten to ~45% on the same axis.
 
-```
-src/<type>/<slug>.ts   →   export const <camelCase> = { fields: string[], ... }
-```
+**Quadrant selection (click expand):**
 
-The owning rendering component imports every module by name into a literal array and filters by `field`:
+1. User clicks quadrant N. `Quadrant.tsx` calls `onSelect(N)` and sets `selectedQuadrant`.
+2. `page.tsx` re-runs the accent-swap effect (selected wins over hovered).
+3. Selected quadrant resizes to ~80% × ~80%. Other three collapse to ~20% on each axis.
+4. `PortfolioCard` opacity drops to 0 (`pointerEvents: "none"`); it's still mounted but invisible.
+5. `QuadrantInterface` mounts inside the selected quadrant via `<AnimatePresence mode="popLayout">`. Header shows close button + the field label (centred) + a width-matching spacer. Body splits 70/30 into left content column + right skills column.
+6. The 4 left-column list components (`Educations`, `Projects`, `Contributions`, `Certificates`) mount. Each one runs `useMemo(() => allEntries.filter(e => e.fields.includes(field as Type["fields"][number])).sort(...), [field])`. Empty results return `null` so the section disappears entirely (the `divide-y` Tailwind utility on the parent ensures no orphan dividers between hidden sections — see notes.md §Divider behaviour).
+7. `Skills` mounts in the right column with the same field-filter pattern.
+8. Each filtered card mounts via `<motion.li>` with `initial / animate` opacity + x stagger; `whileHover` shifts each line `x: 2` (no scale — see notes.md §Hover-clip fix history).
 
-```ts
-// e.g. src/components/Projects.tsx lines 21-43
-const allProjects = [imageBrowser, tectra, vynapse, ...];
-const projects = useMemo(
-  () => allProjects.filter(p => p.fields.includes(field)).sort((a,b) => a.title.localeCompare(b.title)),
-  [field]
-);
-```
+**Closing the selection:**
 
-Adding new content = create file under `src/<type>/`, add to the import + array literal in the matching rendering component. There is no glob, no manifest, no auto-discovery — each new entry requires touching the index in two places (import statement + array spread).
+1. User clicks the close button or the dimmed background. `page.tsx` clears `selectedQuadrant`.
+2. `QuadrantInterface` unmounts via AnimatePresence.
+3. Quadrants spring back to 50%×50% (`spring stiffness: 500, damping: 25`). PortfolioCard fades back in.
+4. Accent CSS variables resolve back to `--accent-default-*` if no quadrant is hovered.
 
-**Content-type schemas** (inferred from data files):
+## Inter-System Relationships
 
-| Type | Folder | Count | Schema |
-|------|--------|-------|--------|
-| Project | `src/projects/` | 12 | `{ title, date, fields[], links: { github?, website? }, description[], techStack?, technicalDetails[] }` |
-| Skill | `src/skills/` | 12 | `{ name, fields[], subskills[], bulletPoints[] }` |
-| Education | `src/educations/` | 1 | `{ title, location, degree, date, fields[], bullets[] }` |
-| Certificate | `src/certificates/` | 5 | `{ title, fields[], company, degrees[], skills[] }` |
+| Mechanism | Producer → Consumer | Data shape | Failure mode |
+|-----------|---------------------|------------|--------------|
+| **`Field` discriminated union** | `src/types/field.ts` → every list component + every content module | `"Systems & Infrastructure Engineer" \| "Applied AI & ML Infrastructure Engineer" \| "Low Level Financial Systems Engineer" \| "Open Source Engineer"` | A typo in any content module's `fields` array fails `tsc --noEmit`. The four quadrant labels in `page.tsx`'s `<Quadrant label="...">` props must also match these exact strings — no compile-time enforcement here, runtime will silently render a quadrant whose `field` filter matches no content. |
+| **CSS custom-property cascade for theming** | `page.tsx` `useEffect` → `documentElement.style` → every `var(--accent-purple)` reader (gradients, icons, badges, buttons) | three CSS values per swap (`--accent-purple` + `-dim` + `-glow`) | Variables named `--accent-purple-*` for historical reasons but actually carry the active accent. Renaming would break the indirection layer, see notes.md §Theming gotcha. |
+| **`field` prop into list components** | `QuadrantInterface` `field={label}` → `<Educations / Projects / Contributions / Certificates / Skills field={field} />` | string carrying the quadrant label | The `field: string` prop type is intentionally loose — the list components cast at the `.filter()` boundary via `field as X["fields"][number]`. The cast is honest because the producer (`page.tsx`) is hardcoded with the four canonical strings. |
+| **Highlighted-projects independent array** | `PortfolioCard.tsx` const `highlightedProjects` (4 items) | local hardcoded shape — `{title, icon: LucideIcon, link, description}` | Decoupled from `src/content/projects/` by design — the floating card's curated 4 (Cernio, Aurix, NeuroDrive, Image Browser) is editorial, not derived. If a featured project is renamed in `content/projects/` but not here, the floating card silently keeps the old name. Worth wiring through `Project.featured?: boolean` later (the type field already exists). |
+| **`Contribution.fields[]` filter ⟷ `<Contributions field>`** | content/open-source/*.ts → Contributions.tsx | `Field[]` — currently every contribution sets `["Open Source Engineer"]`, so contributions only ever appear in the 4th quadrant | If a contribution is field-tagged for a non-OSS quadrant, it'll appear there. Currently always single-tagged for OSS. |
 
-No shared `types.ts` — every component re-declares its prop interface inline. Schemas drift independently per file (`description` on Project vs `bullets` on Education vs `bulletPoints` on Skill).
+## Critical Paths and Blast Radius
 
-## Component hierarchy
+The single critical path is **quadrant click → 5-section mount with field-filter**. Tracing it end to end:
 
-```
-src/app/page.tsx (Home)
-└── AccentColorProvider                       (src/contexts/AccentColorContext.tsx)
-    ├── ParticleNetwork                       (canvas background, fixed inset, opacity 0.4)
-    ├── PortfolioCard                         (centred 600px card; visible iff selectedQuadrant === null)
-    │   └── highlightedProjects: HighlightedProject[]   (HARDCODED — independent of src/projects/)
-    │       ├── Nyquestro
-    │       ├── Image Browser
-    │       ├── Vynapse
-    │       └── Chrona
-    │   ├── socials (GitHub, LinkedIn)
-    │   ├── "Full Resume" download → /cv/generic_cv.pdf
-    │   └── dynamic description (default text or hovered-project.description)
-    ├── Quadrant pos=1 …                      (4 instances, one per role)
-    │   └── AnimatePresence
-    │       ├── isSelected:        <QuadrantInterface field={label} />
-    │       ├── shouldShowIcon:    <Icon /> (lucide)
-    │       └── default:           <h2>{label}</h2>
-    └── (siblings share state via lifted hoveredQuadrant / selectedQuadrant)
+1. **Entry.** `Quadrant.onClick` event on the outer `motion.div`.
+2. **State update.** `page.tsx` setSelectedQuadrant(N).
+3. **Effect cascade.** `useEffect` writes 3 CSS custom properties to `documentElement`. CSS interpolation fires globally for ~250ms.
+4. **Layout recompute.** All 4 quadrants recompute size via the `useMemo` chain in `Quadrant.tsx` (depends on `selectedQuadrant`, `hoveredQuadrant`, `position`, `isHovered`, `isAnyHovered`).
+5. **AnimatePresence transition.** Old icon/label fades out; `QuadrantInterface` fades in.
+6. **5 list components mount.** Each runs its memoised field-filter against its data array. Per-card `<motion.li>` mounts with stagger.
+7. **Final paint.** Selected quadrant at ~80%, three others at ~20%, `QuadrantInterface` body visible, scrollable per column.
 
-QuadrantInterface  (src/components/QuadrantInterface.tsx)
-├── Header bar (border-b accent-border)
-│   ├── X close button
-│   ├── <h2>{field}</h2>
-│   └── "Download CV" button (TODO — onClick is a stub, line 44)
-└── Content area (flex gap-4)
-    ├── Left column 70%
-    │   ├── Educations field={field}     → filters [universityOfYork]
-    │   ├── divider
-    │   ├── Projects field={field}       → filters 12 projects
-    │   ├── divider
-    │   └── Certificates field={field}   → filters 5 certificates
-    └── Right column 30%
-        └── Skills field={field}         → filters 12 skills (Accordion)
-```
+**Blast radius if the Field union changes:**
+- Adding a 5th quadrant: requires (i) new Field literal + FIELDS tuple entry, (ii) globals.css OKLCH triplet, (iii) `page.tsx` positionToTheme map + 5th `<Quadrant label="...">`, (iv) `Quadrant.tsx` labelIconMap + icon import, (v) any content module that should appear there gets re-tagged. The grid layout machinery (`size` useMemo in `Quadrant.tsx`) currently assumes exactly 4 positions — would need restructuring.
+- Removing/renaming a quadrant: every content module tagged with the old field becomes orphaned (won't render anywhere). Build still passes (the cast at `.filter()` allows any string), but the data is silently invisible. This is the failure mode the type system would help catch if `field: string` were tightened to `field: Field` everywhere — see notes.md §Type-tightening opportunity.
 
-`Projects` / `Skills` / `Educations` / `Certificates` are all `memo(...)` components. Each owns its own data import wall and filter pipeline.
+## State Ownership
 
-`Project`, `Skill`, `Education`, `Certificate` (singular) are `memo(...)` row renderers. Project + Skill + Education + Certificate all use a `Technical Details` / `Highlights` / `View Details` accordion (`@/components/ui/accordion` — Radix `@radix-ui/react-accordion`). Skill + Certificate use Badge for chip lists.
+| State | Owner | Scope |
+|-------|-------|-------|
+| `hoveredQuadrant: number \| null` | `page.tsx` (parent) | Drives accent CSS swap + sibling-quadrant size recompute + PortfolioCard parallax offset |
+| `selectedQuadrant: number \| null` | `page.tsx` (parent) | Wins over hovered; drives the 80/20 expand layout + QuadrantInterface mount + PortfolioCard fade-out |
+| `hoveredProject: number \| null` | `PortfolioCard` (local) | Swaps the description text under the chip row |
+| `mousePosition` (canvas only) | `ParticleNetwork.tsx` `mouseRef` | Ref, not state — read inside the rAF loop for the mouse-repulsion force, never triggers a React re-render |
+| `isVisibleRef` | `ParticleNetwork.tsx` ref | Toggled by IntersectionObserver; read inside the rAF loop to short-circuit work when off-screen |
+| Accent CSS values | `documentElement.style` | DOM-side, not React state — bypasses re-renders for the theme swap |
 
-## Theming model
+No global React state, no context providers (AccentColorContext was deleted as unused). The two top-level pieces of state in `page.tsx` plus DOM-side CSS variables carry the entire interactive model.
 
-The accent system is split across three layers:
+## Structural Notes / Current Reality
 
-**Layer 1 — static palette in `globals.css` `.dark` block** (lines 181-205):
+- **One static route.** `src/app/page.tsx` is the only page. No nested routes, no API routes, no middleware. The `_not-found` route is Next's default.
+- **No persistent state.** No SWR, no Zustand, no localStorage. Hover/select state is ephemeral; reload starts fresh.
+- **No tests configured.** `package.json` has no test script. The discipline is `tsc --noEmit` + `pnpm build` for type/build correctness, plus manual browser smoke for visual correctness. CLAUDE.md flags this explicitly: type-check + build success ≠ visual correctness.
+- **The 4th quadrant changed identity 2026-05-10.** Was "Product & Full Stack Engineer" with red accent (hue 25); now "Open Source Engineer" with warm amber accent (hue 65). Theme triplet renamed to `--accent-opensource-*`. Icon swapped from `Code` → `GitBranch`. Every content module's `fields` array was migrated; nothing references the old field string anymore.
+- **The OSS quadrant is the only quadrant that uses `<Contributions>`.** Currently every contribution sets `fields: ["Open Source Engineer"]`. The Contributions component still appears in `QuadrantInterface`'s left-column stack regardless of which quadrant is open — `null`-return-on-empty + Tailwind `divide-y` ensure it doesn't render or produce orphan dividers when no contributions field-match.
+- **The pnpm 11 build-script approval.** `pnpm-workspace.yaml` carries an `allowBuilds: { sharp: true, unrs-resolver: true }` block. Without it, `pnpm install` exits 1 with `ERR_PNPM_IGNORED_BUILDS`. The `pnpm.onlyBuiltDependencies` field in `package.json` is also set as a belt-and-braces but the workspace YAML is the file pnpm 11 actually reads. See notes.md §pnpm install gotcha.
+- **Multiple lockfile warning.** Next dev warns about a `package-lock.json` at `~/package-lock.json` (user's home directory). It's unrelated to this project but Next picks it up via the workspace-root inference. Harmless — the project uses `pnpm-lock.yaml`. Can be silenced with `turbopack.root` in `next.config.ts` if it ever becomes a real issue.
 
-```
---accent-default        oklch(0.5  0.02 0  )    grey
---accent-systems        oklch(0.65 0.08 285)    muted purple/lilac
---accent-ai             oklch(0.65 0.08 230)    muted blue
---accent-finance        oklch(0.65 0.08 150)    muted green
---accent-fullstack      oklch(0.65 0.08 25 )    muted red
-```
+## Coverage
 
-Each of the 5 themes ships a triplet: base, `-dim`, and `-glow` (with alpha). Same lightness/chroma/hue convention across all four quadrants — only the hue rotates.
+This run inspected every first-party source file in the repository as part of the Phase 1-6 restructure that preceded this upkeep pass:
 
-**Layer 2 — active variables resolved at runtime** (lines 207-210):
+- **Inspected directly (every file read in full):** `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/globals.css`, every component in `src/components/{shell,projects,skills,educations,certificates,open-source}/`, every type in `src/types/`, every content module in `src/content/{projects,skills,educations,certificates,open-source}/`, `next.config.ts`, `tsconfig.json`, `package.json`, `pnpm-workspace.yaml`, `README.md`, `CLAUDE.md`, `eslint.config.mjs`, `postcss.config.mjs`.
+- **Noted but not re-read this session:** `src/components/ui/accordion.tsx` and `src/components/ui/badge.tsx` (shadcn primitives — Radix-derived, framework-supplied, semantic intent stable across the shadcn ecosystem).
+- **Inferred from structure:** none. First-party code is fully inspected; shadcn primitives are framework-supplied with well-known semantics.
+- **Git history scoped:** `git log --format=fuller f664ae6^..HEAD` covering the 8 commits this session (commit hashes f664ae6 → 5dbfd02). Bodies inspected, not just subjects. The bodies are the highest-yield rationale source for this project — every Phase commit explains the design decisions in detail.
 
-```
---accent-purple        ← always points at the currently active theme's base
---accent-purple-dim
---accent-purple-glow
-```
+No subsystem is undocumented. The project's small surface area (single route, ~30 first-party files) means `architecture.md` + `notes.md` plus a single `systems/quadrant-interaction.md` for the densest subsystem is the proportionate context shape. Further splitting into per-folder systems files (one per content domain) would be padding — every other system fits as a row in the Subsystem Responsibilities table above.
 
-The variable name is misleadingly fixed as `purple` (legacy from when the default was purple); every utility class binds to `--accent-purple`, not to a theme-specific variable. Theme switching = rewriting these three CSS vars on `document.documentElement` from `page.tsx` `useEffect` (lines 25-51) whenever `hoveredQuadrant || selectedQuadrant` changes.
-
-**Layer 3 — utility classes consuming `--accent-purple*`** (`globals.css` lines 276-356):
-
-| Class | Effect |
-|-------|--------|
-| `.text-gradient-purple` | `linear-gradient(135deg, accent → mix → accent)` clipped to text |
-| `.icon-gradient` | `stroke: var(--accent-purple)` + drop-shadow with `--accent-purple-glow` |
-| `.cv-button` | gradient fill from base → dim |
-| `.accent-button` | translucent base over transparent (`color-mix 10%` → `20%` on hover) |
-| `.accent-border` | `border-color: color-mix(--accent-purple 20%, transparent)` |
-| `.accent-text` / `.accent-text-hover` | text colour mixed with white (60% on resting, 100% on hover) |
-| `.border-gradient` | layered backgrounds: solid panel + diagonal gradient border-box |
-| `.gradient-bg` | flat `hsl(285, 6%, 15%)` page background |
-
-`html` declares CSS-property transitions on `--accent-purple*` (lines 222-227) wrapped in `@supports (transition: --accent-purple 0.25s)` so accent swaps fade rather than snap on browsers that support property animation.
-
-**`AccentColorContext`** (`src/contexts/AccentColorContext.tsx`) defines a `currentTheme` state + `setTheme` setter with type `QuadrantTheme = "default" | "systems" | "ai" | "finance" | "fullstack"`. Wraps the page tree but **is not actually consumed by any component** — the real theme swap happens via direct `root.style.setProperty` writes in `page.tsx`. The provider exists as scaffolding for a context-driven version that has not been wired up.
-
-## Animation conventions
-
-- **Framer Motion (`motion/react`)** is the only animation library — no GSAP, no CSS keyframes for component-level motion (CSS keyframes exist only for shadcn accordion + theme-level `float`/`shimmer`/`gradient-shift`/`pulse-subtle` utilities, of which only `pulse-subtle` is bound to `--animate-pulse-subtle`).
-- **Memoised variants pattern**: every component with motion declares its variants via `useMemo(() => ({ ... }), [])` rather than inline objects. Established as a deliberate optimisation in commit `cbce0d2` "Refactor animation variants with useMemo for performance". Applies to `PortfolioCard`, `Quadrant`, `Project`, `Skill`, `Education`, `Certificate`.
-- **Throttled mousemove**: `Quadrant.tsx` lines 124-140 throttle pointer-tracking inside a quadrant to `~32ms` (≈30 fps) using a `lastUpdateRef`. The tracked `mousePosition` is set into state but is not currently consumed for rendering — leftover from an earlier tilt/parallax effect that has been removed.
-- **`AnimatePresence mode="popLayout"`** drives the icon ↔ label ↔ interface swap inside each quadrant (`Quadrant.tsx` line 218) so the AnimatePresence children share layout.
-- **`layout="size"`** on the inner PortfolioCard wrapper (`PortfolioCard.tsx` line 285) enables size-only layout animation while the float keyframe drives `y: [0, -8, 0]` independently.
-- **Spring vs duration**: spring transitions used for size/position changes (`Quadrant`, icon entry); explicit `duration` + `easeInOut` used for fades and label cross-fades.
-- **Stagger via `delay: index * 0.04`**: bullet/badge lists animate in with index-based delays in `Project`, `Skill`, `Education`, `Certificate`.
-
-## ParticleNetwork (background)
-
-`src/components/ParticleNetwork.tsx` — 232 lines, full canvas-2D simulation:
-
-- 240 particles initialised at random positions with low random velocities (line 39).
-- **Spatial hash grid** with `cellSize = 120` for O(n) neighbour lookups (lines 53-72) — neighbour search returns the 3×3 cell block around a particle.
-- **Per-frame physics**:
-  - integrate position; wrap toroidally on screen edges (lines 94-101).
-  - small random drift each frame (line 104-105).
-  - **center-attraction** force scaled by distance-from-centre / max-distance (lines 107-125) — pulls particles harder the further they drift, prevents edge clustering. Added in commit `80d9fe4`.
-  - **particle-particle repulsion** within radius 80 (lines 128-154).
-  - **mouse repulsion** within radius 450 (lines 157-168) — global `mousemove` listener writes to `mouseRef`.
-  - friction `* 0.99` per axis (lines 171-172).
-- **Connections**: line drawn between any two particles within `maxDistance = 120`, opacity `(1 - dist/maxDistance) * 0.3`, colour `rgba(168, 150, 200, ...)` — a fixed lilac that does **not** participate in the accent-theme swap.
-- Canvas is `position: absolute`, `inset: 0`, `pointer-events: none`, `opacity: 0.4`.
-
-## Notable absent pieces
-
-- No tests anywhere (no `__tests__/`, no `.test.tsx`, no Vitest/Jest config).
-- No CI configuration committed (no `.github/workflows/`).
-- No `loading.tsx`, `error.tsx`, `not-found.tsx` under `src/app/`.
-- No image optimisation usage — `next/image` is not imported anywhere; portfolio relies on icons + text only.
-- No analytics, no SEO beyond the title/description metadata.
-- `README.md` is one sentence — minimal directional document.
+See [`systems/quadrant-interaction.md`](systems/quadrant-interaction.md) for the deep dive on the central interaction subsystem (state machine, layout math, theming swap mechanism, dead-state and AccentColorContext deletion history).
