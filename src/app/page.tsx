@@ -3,18 +3,16 @@
 import { Quadrant } from "@/components/shell/Quadrant";
 import { ParticleNetwork } from "@/components/shell/ParticleNetwork";
 import { PortfolioCard } from "@/components/shell/PortfolioCard";
-import {
-  AccentColorProvider,
-  QuadrantTheme,
-} from "@/contexts/AccentColorContext";
 import { useState, useEffect } from "react";
+
+type QuadrantTheme = "default" | "systems" | "ai" | "finance" | "opensource";
 
 // Position to theme mapping
 const positionToTheme: Record<number, QuadrantTheme> = {
   1: "systems",
   2: "ai",
   3: "finance",
-  4: "fullstack",
+  4: "opensource",
 };
 
 export default function Home() {
@@ -55,54 +53,52 @@ export default function Home() {
   };
 
   return (
-    <AccentColorProvider>
-      <div
-        className="h-screen w-screen flex flex-wrap gradient-bg p-2 relative overflow-hidden"
-        style={{ perspective: 1000 }}
-        onClick={handleBackgroundClick}
-      >
-        {/* Interactive particle network background */}
-        <ParticleNetwork />
+    <div
+      className="h-screen w-screen flex flex-wrap gradient-bg p-2 relative overflow-hidden"
+      style={{ perspective: 1000 }}
+      onClick={handleBackgroundClick}
+    >
+      {/* Interactive particle network background */}
+      <ParticleNetwork />
 
-        {/* Portfolio Card */}
-        <PortfolioCard
-          hoveredQuadrant={hoveredQuadrant}
-          selectedQuadrant={selectedQuadrant}
-        />
+      {/* Portfolio Card */}
+      <PortfolioCard
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+      />
 
-        <Quadrant
-          position={1}
-          hoveredQuadrant={hoveredQuadrant}
-          selectedQuadrant={selectedQuadrant}
-          onHoverChange={setHoveredQuadrant}
-          onSelect={setSelectedQuadrant}
-          label="Systems & Infrastructure Engineer"
-        />
-        <Quadrant
-          position={2}
-          hoveredQuadrant={hoveredQuadrant}
-          selectedQuadrant={selectedQuadrant}
-          onHoverChange={setHoveredQuadrant}
-          onSelect={setSelectedQuadrant}
-          label="Applied AI & ML Infrastructure Engineer"
-        />
-        <Quadrant
-          position={3}
-          hoveredQuadrant={hoveredQuadrant}
-          selectedQuadrant={selectedQuadrant}
-          onHoverChange={setHoveredQuadrant}
-          onSelect={setSelectedQuadrant}
-          label="Low Level Financial Systems Engineer"
-        />
-        <Quadrant
-          position={4}
-          hoveredQuadrant={hoveredQuadrant}
-          selectedQuadrant={selectedQuadrant}
-          onHoverChange={setHoveredQuadrant}
-          onSelect={setSelectedQuadrant}
-          label="Product & Full Stack Engineer"
-        />
-      </div>
-    </AccentColorProvider>
+      <Quadrant
+        position={1}
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+        onHoverChange={setHoveredQuadrant}
+        onSelect={setSelectedQuadrant}
+        label="Systems & Infrastructure Engineer"
+      />
+      <Quadrant
+        position={2}
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+        onHoverChange={setHoveredQuadrant}
+        onSelect={setSelectedQuadrant}
+        label="Applied AI & ML Infrastructure Engineer"
+      />
+      <Quadrant
+        position={3}
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+        onHoverChange={setHoveredQuadrant}
+        onSelect={setSelectedQuadrant}
+        label="Low Level Financial Systems Engineer"
+      />
+      <Quadrant
+        position={4}
+        hoveredQuadrant={hoveredQuadrant}
+        selectedQuadrant={selectedQuadrant}
+        onHoverChange={setHoveredQuadrant}
+        onSelect={setSelectedQuadrant}
+        label="Open Source Engineer"
+      />
+    </div>
   );
 }

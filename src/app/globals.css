@@ -199,10 +199,10 @@
   --accent-finance-dim: oklch(0.45 0.06 150);
   --accent-finance-glow: oklch(0.55 0.12 150 / 0.3);
 
-  /* Full Stack - Muted Red */
-  --accent-fullstack: oklch(0.65 0.08 25);
-  --accent-fullstack-dim: oklch(0.45 0.06 25);
-  --accent-fullstack-glow: oklch(0.55 0.12 25 / 0.3);
+  /* Open Source - Warm Amber */
+  --accent-opensource: oklch(0.7 0.1 65);
+  --accent-opensource-dim: oklch(0.5 0.08 65);
+  --accent-opensource-glow: oklch(0.6 0.14 65 / 0.3);
 
   /* Active accent color variables (will be updated dynamically) */
   --accent-purple: var(--accent-default);

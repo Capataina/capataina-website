@@ -9,7 +9,6 @@ import { nyquestro } from "@/content/projects/nyquestro";
 import { multiLlmDebate } from "@/content/projects/multi-llm-debate";
 import { asteroidsAI } from "@/content/projects/asteroids-ai";
 import { fraudDetection } from "@/content/projects/fraud-detection";
-import { gameMods } from "@/content/projects/game-mods";
 import { neuronika } from "@/content/projects/neuronika";
 import { personalWebsite } from "@/content/projects/personal-website";
 
@@ -28,7 +27,6 @@ export const Projects = memo(function Projects({ field }: ProjectsProps) {
     multiLlmDebate,
     asteroidsAI,
     fraudDetection,
-    gameMods,
     neuronika,
     personalWebsite,
   ];

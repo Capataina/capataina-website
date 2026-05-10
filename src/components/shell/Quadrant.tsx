@@ -1,15 +1,15 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useRef, MouseEvent, useCallback, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { QuadrantInterface } from "./QuadrantInterface";
-import { Cpu, Brain, Code, Database, LucideIcon } from "lucide-react";
+import { Cpu, Brain, GitBranch, Database, LucideIcon } from "lucide-react";
 
 // Icon mapping for each quadrant label
 const labelIconMap: Record<string, LucideIcon> = {
   "Systems & Infrastructure Engineer": Cpu,
   "Applied AI & ML Infrastructure Engineer": Brain,
-  "Product & Full Stack Engineer": Code,
+  "Open Source Engineer": GitBranch,
   "Low Level Financial Systems Engineer": Database,
 };
 
@@ -30,9 +30,7 @@ export function Quadrant({
   onSelect,
   label,
 }: QuadrantProps) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const quadrantRef = useRef<HTMLDivElement>(null);
-  const lastUpdateRef = useRef<number>(0);
 
   const isSelected = selectedQuadrant === position;
   const isHovered = hoveredQuadrant === position && !isSelected;
@@ -120,25 +118,6 @@ export function Quadrant({
     []
   );
 
-  // Throttle mouse movement to ~30fps (32ms) for performance
-  const handleMouseMove = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    const now = Date.now();
-    if (now - lastUpdateRef.current < 32) return;
-    lastUpdateRef.current = now;
-
-    if (!quadrantRef.current) return;
-
-    const rect = quadrantRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    // Calculate normalized position relative to center (-1 to 1 range)
-    const x = (e.clientX - centerX) / (rect.width / 2);
-    const y = (e.clientY - centerY) / (rect.height / 2);
-
-    setMousePosition({ x, y });
-  }, []);
-
   // Memoize size calculation
   const size = useMemo(() => {
     if (isSelected) {
@@ -207,7 +186,6 @@ export function Quadrant({
             : "0 2px 8px -1px rgba(0, 0, 0, 0.3)",
       }}
       transition={quadrantTransition}
-      onMouseMove={!isSelected ? handleMouseMove : undefined}
       onMouseEnter={() => !isSelected && onHoverChange(position)}
       onMouseLeave={() => !isSelected && onHoverChange(null)}
       onClick={(e) => {

@@ -2,6 +2,7 @@ import { Projects } from "@/components/projects/Projects";
 import { Skills } from "@/components/skills/Skills";
 import { Educations } from "@/components/educations/Educations";
 import { Certificates } from "@/components/certificates/Certificates";
+import { Contributions } from "@/components/open-source/Contributions";
 import { X } from "lucide-react";
 
 interface QuadrantInterfaceProps {
@@ -50,11 +51,10 @@ export function QuadrantInterface({
             background: "hsla(285, 8%, 19%, 0.6)",
           }}
         >
-          <div className="space-y-4">
+          <div className="space-y-4 divide-y divide-zinc-700/60 [&>*]:pt-4 [&>*:first-child]:pt-0">
             <Educations field={field} />
-            <div className="border-t border-zinc-600" />
             <Projects field={field} />
-            <div className="border-t border-zinc-600" />
+            <Contributions field={field} />
             <Certificates field={field} />
           </div>
         </div>
