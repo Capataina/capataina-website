@@ -176,6 +176,10 @@ export function Quadrant({
       style={{
         background:
           isHovered || isSelected ? "hsl(285, 10%, 18%)" : "hsl(285, 8%, 16%)",
+        // CSS containment: hover / select state changes only invalidate this
+        // subtree's layout / style / paint, not the rest of the document.
+        // Pure perf win, zero visual change.
+        contain: "layout style paint",
       }}
       animate={{
         width: size.width,

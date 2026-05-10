@@ -19,6 +19,11 @@ export function ParticleNetwork() {
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationRef = useRef<number | undefined>(undefined);
+  // Visibility flag toggled by IntersectionObserver — when the canvas is
+  // scrolled off-screen, the rAF loop short-circuits before doing any
+  // physics / drawing work. Same node count, same physics, just no CPU
+  // burned drawing pixels nobody is looking at.
+  const isVisibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -79,6 +84,12 @@ export function ParticleNetwork() {
 
     // Animation loop
     const animate = () => {
+      // Pause work entirely when off-screen — the IntersectionObserver
+      // will restart us by calling animate() when we re-enter the viewport.
+      if (!isVisibleRef.current) {
+        animationRef.current = undefined;
+        return;
+      }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Build spatial grid for this frame
@@ -212,7 +223,26 @@ export function ParticleNetwork() {
 
     animate();
 
+    // IntersectionObserver: pause when canvas leaves the viewport, resume
+    // when it re-enters. Threshold 0 = trigger on any pixel of overlap.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        const wasVisible = isVisibleRef.current;
+        isVisibleRef.current = entry.isIntersecting;
+        // Hidden → visible transition: kick the loop back on. The flag
+        // check inside `animate` will short-circuit if we're already
+        // running, so this is safe to call without coordination.
+        if (!wasVisible && entry.isIntersecting && animationRef.current === undefined) {
+          animate();
+        }
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("mousemove", handleMouseMove);
       if (animationRef.current) {

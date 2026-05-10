@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Brain,
   Download,
@@ -62,6 +62,11 @@ export function PortfolioCard({
 }: PortfolioCardProps) {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
 
+  // Respect prefers-reduced-motion. Users who explicitly opt out of motion
+  // at the OS level get the still version of the floating card; everyone
+  // else sees the original 4s y-bounce loop. Default = unchanged.
+  const prefersReducedMotion = useReducedMotion();
+
   const defaultDescription =
     "Currently shipping NeuroDrive (M6 brain-substrate), Aurix (Vector A V3 LP backtester audited 2026-05), and Cernio (job-discovery Session 9). Hover over the project chips for more, or click into a quadrant to see everything.";
   const displayedDescription =
@@ -69,24 +74,23 @@ export function PortfolioCard({
       ? highlightedProjects[hoveredProject].description
       : defaultDescription;
 
-  // Memoize animation variants and transitions
+  // Memoize animation variants and transitions. Floating bounce is
+  // skipped when reduced-motion is requested.
   const cardFloatAnimation = useMemo(
-    () => ({
-      y: [0, -8, 0],
-    }),
-    []
+    () => (prefersReducedMotion ? { y: 0 } : { y: [0, -8, 0] }),
+    [prefersReducedMotion]
   );
 
   const cardFloatTransition = useMemo(
     () => ({
       y: {
         duration: 4,
-        repeat: Infinity,
+        repeat: prefersReducedMotion ? 0 : Infinity,
         ease: "easeInOut" as const,
       },
       layout: { duration: 0.2, ease: "easeOut" as const },
     }),
-    []
+    [prefersReducedMotion]
   );
 
   const headerInitialVariants = useMemo(

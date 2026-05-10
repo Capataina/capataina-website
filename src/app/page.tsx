@@ -1,9 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Quadrant } from "@/components/shell/Quadrant";
-import { ParticleNetwork } from "@/components/shell/ParticleNetwork";
 import { PortfolioCard } from "@/components/shell/PortfolioCard";
 import { useState, useEffect } from "react";
+
+// Code-split the canvas-heavy ParticleNetwork component — its physics +
+// rAF loop don't need to be in the initial bundle. ssr:false because the
+// canvas API is browser-only; trying to render it server-side produces
+// hydration mismatches without changing the visible output.
+const ParticleNetwork = dynamic(
+  () => import("@/components/shell/ParticleNetwork").then((m) => m.ParticleNetwork),
+  { ssr: false }
+);
 
 type QuadrantTheme = "default" | "systems" | "ai" | "finance" | "opensource";
 
