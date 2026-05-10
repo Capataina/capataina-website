@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useRef, useMemo } from "react";
+import type { CSSProperties } from "react";
 import { QuadrantInterface } from "./QuadrantInterface";
 import { Cpu, Brain, GitBranch, Database, LucideIcon } from "lucide-react";
 
@@ -20,7 +21,32 @@ interface QuadrantProps {
   onHoverChange: (position: number | null) => void;
   onSelect: (position: number | null) => void;
   label: string;
+  /** When true, the quadrant collapses to an L-shape pinned to its corner
+   *  via clip-path; the central 80% × 80% area is freed for the articles
+   *  panel. Hover and click semantics are also disabled — the L-shapes
+   *  are visual chrome that lets the page background show through. */
+  articlesMode?: boolean;
 }
+
+// L-shape clip-path classes are defined in globals.css — applying them via
+// className (rather than an inline `clipPath` style on a motion.div) keeps
+// the path applied consistently through layout animations.
+const L_SHAPE_CLASS: Record<number, string> = {
+  1: "quadrant-l-1",
+  2: "quadrant-l-2",
+  3: "quadrant-l-3",
+  4: "quadrant-l-4",
+};
+
+// Corner-icon positions per quadrant. Fixed pixel insets give equal
+// physical distance from every viewport corner regardless of quadrant
+// aspect ratio (percentages would skew on non-square viewports).
+const CORNER_POSITIONS: Record<number, CSSProperties> = {
+  1: { top: "1.75rem", left: "1.75rem" },
+  2: { top: "1.75rem", right: "1.75rem" },
+  3: { bottom: "1.75rem", left: "1.75rem" },
+  4: { bottom: "1.75rem", right: "1.75rem" },
+};
 
 export function Quadrant({
   position,
@@ -29,6 +55,7 @@ export function Quadrant({
   onHoverChange,
   onSelect,
   label,
+  articlesMode = false,
 }: QuadrantProps) {
   const quadrantRef = useRef<HTMLDivElement>(null);
 
@@ -127,6 +154,13 @@ export function Quadrant({
     const isLeftColumn = position % 2 === 1;
     const isTopRow = position <= 2;
 
+    // Case-studies mode → 50/50 (each quadrant fills its corner; clip-path
+    // carves the L-shape inside). Hover during this mode does not change
+    // size — the visual response would fight with the central panel.
+    if (articlesMode) {
+      return { width: "calc(50% - 16px)", height: "calc(50% - 16px)" };
+    }
+
     // No selection → original idle / hover layout.
     if (selectedQuadrant === null) {
       if (!isAnyHovered) {
@@ -188,23 +222,40 @@ export function Quadrant({
       width: `calc(${widthPct}% - 16px)`,
       height: `calc(${heightPct}% - 16px)`,
     };
-  }, [position, selectedQuadrant, hoveredQuadrant, isAnyHovered, isHovered]);
+  }, [
+    position,
+    selectedQuadrant,
+    hoveredQuadrant,
+    isAnyHovered,
+    isHovered,
+    articlesMode,
+  ]);
 
   const isActive = isHovered || isSelected;
 
   // Memoize the inline style object so referential equality holds across
   // renders that don't change `isActive`. Saves React's style-prop diff.
-  const quadrantStyle = useMemo(
-    () => ({
+  // In articles mode the bg alpha is bumped so the L-shape is clearly
+  // visible against the page background; the clip-path itself is applied
+  // via the className below.
+  const quadrantStyle = useMemo(() => {
+    if (articlesMode) {
+      return {
+        background: "hsla(285, 10%, 18%, 0.22)",
+        backdropFilter: "blur(2px)",
+        WebkitBackdropFilter: "blur(2px)",
+        contain: "layout style paint" as const,
+      };
+    }
+    return {
       background: isActive
         ? "hsla(285, 10%, 18%, 0.10)"
         : "hsla(285, 8%, 16%, 0.06)",
       backdropFilter: "blur(2px)",
       WebkitBackdropFilter: "blur(2px)",
       contain: "layout style paint" as const,
-    }),
-    [isActive]
-  );
+    };
+  }, [isActive, articlesMode]);
 
   // Memoize the animate target so Motion can short-circuit when the
   // size + shadow tuple is unchanged across renders.
@@ -219,20 +270,54 @@ export function Quadrant({
     [size.width, size.height, isActive]
   );
 
+  // L-shape class is applied alongside the existing layout classes when
+  // articles mode is on. The class lives in globals.css so motion's
+  // style merging can't strip it.
+  const quadrantClass = articlesMode
+    ? `flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300 select-none ${L_SHAPE_CLASS[position]}`
+    : "flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300 select-none";
+
   return (
     <motion.div
       ref={quadrantRef}
-      className="flex items-center justify-center rounded-2xl m-2 border-gradient transition-shadow duration-300 select-none"
+      className={quadrantClass}
       style={quadrantStyle}
       animate={quadrantAnimate}
       transition={quadrantTransition}
-      onMouseEnter={() => !isSelected && onHoverChange(position)}
-      onMouseLeave={() => !isSelected && onHoverChange(null)}
+      onMouseEnter={() =>
+        !isSelected && !articlesMode && onHoverChange(position)
+      }
+      onMouseLeave={() =>
+        !isSelected && !articlesMode && onHoverChange(null)
+      }
       onClick={(e) => {
+        // In articles mode the L-shape is visual chrome only; let the
+        // click bubble to the page background handler so it closes the
+        // panel instead of opening this quadrant.
+        if (articlesMode) return;
         e.stopPropagation();
         onSelect(isSelected ? null : position);
       }}
     >
+      {/* Corner icon — only mounted in articles mode. Sits at the
+          inside-the-L corner square (10% × 10% of the viewport), the
+          only un-clipped region of the element. */}
+      <AnimatePresence>
+        {articlesMode && Icon && (
+          <motion.div
+            key="corner-icon"
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.6 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+            className="absolute pointer-events-none"
+            style={CORNER_POSITIONS[position]}
+          >
+            <Icon className="w-9 h-9 icon-gradient" strokeWidth={1.5} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="popLayout">
         {isSelected ? (
           <QuadrantInterface
@@ -251,7 +336,7 @@ export function Quadrant({
           >
             <Icon className="w-10 h-10 icon-gradient" strokeWidth={1.5} />
           </motion.div>
-        ) : (
+        ) : articlesMode ? null : (
           <motion.h2
             key="label"
             initial={labelInitialVariants}

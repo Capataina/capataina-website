@@ -301,6 +301,74 @@
   }
 }
 
+/* Article cascade — direct children of `.cascade-fade` reveal in document
+   order with a small per-element delay so the article doesn't pop in all
+   at once. The `--cascade-index` custom property is set per-child by
+   ArticleView's useLayoutEffect. The min() cap keeps the total reveal
+   time bounded for very long articles. */
+@keyframes cascade-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cascade-fade > * {
+  opacity: 0;
+  animation: cascade-fade-in 0.35s ease-out forwards;
+  animation-delay: calc(min(var(--cascade-index, 0), 24) * 35ms);
+}
+
+/* Quadrant L-shape clip-paths used in articles mode. Each polygon
+   carves the quadrant element (50% × 50% of viewport) into a corner L
+   that owns ¼ of the perimeter strip. Element-relative percentages —
+   20% of the element = 10% of viewport, matching the panel's 80% × 80%
+   centred footprint. */
+.quadrant-l-1 {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 20%,
+    20% 20%,
+    20% 100%,
+    0 100%
+  );
+}
+.quadrant-l-2 {
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    80% 100%,
+    80% 20%,
+    0 20%
+  );
+}
+.quadrant-l-3 {
+  clip-path: polygon(
+    0 0,
+    20% 0,
+    20% 80%,
+    100% 80%,
+    100% 100%,
+    0 100%
+  );
+}
+.quadrant-l-4 {
+  clip-path: polygon(
+    80% 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 80%,
+    80% 80%
+  );
+}
+
 @layer utilities {
   .gradient-bg {
     background: hsl(285, 6%, 15%);

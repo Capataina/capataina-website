@@ -10,3 +10,5 @@ export type {
   ContributionMetrics,
   ContributionStatus,
 } from "./contribution";
+export type { Article, ArticleType } from "./article";
+export { ARTICLE_TYPES } from "./article";
