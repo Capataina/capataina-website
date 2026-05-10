@@ -3,6 +3,7 @@
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import {
   Brain,
+  Cpu,
   Download,
   Github,
   Image as ImageIcon,
@@ -43,6 +44,13 @@ const highlightedProjects: HighlightedProject[] = [
       "Brain-inspired continual-learning substrate in Rust + Bevy — Hebbian plasticity, STDP eligibility traces, dopamine-modulated weight updates, and structural plasticity inside a deterministic 2D racing environment, deliberately built without backpropagation or ML frameworks.",
   },
   {
+    title: "Nyquestro",
+    icon: Cpu,
+    link: "https://github.com/Capataina/Nyquestro",
+    description:
+      "Lock-free limit-order-book matching engine in safe Rust — multi-instrument routing, integrated risk controls (kill-switches, throttles, fat-finger protection), Ratatui observability dashboard with live latency + fill-rate telemetry, and live Coinbase WebSocket market-data integration for BTC, ETH, SOL.",
+  },
+  {
     title: "Image Browser",
     icon: ImageIcon,
     link: "https://github.com/Capataina/PinterestStyleImageBrowser",
@@ -68,7 +76,7 @@ export function PortfolioCard({
   const prefersReducedMotion = useReducedMotion();
 
   const defaultDescription =
-    "Currently shipping NeuroDrive (M6 brain-substrate), Aurix (Vector A V3 LP backtester audited 2026-05), and Cernio (job-discovery Session 9). Hover over the project chips for more, or click into a quadrant to see everything.";
+    "Currently shipping NeuroDrive (M6 brain-substrate), Aurix (Vector A V3 LP backtester audited 2026-05), Nyquestro (Phase D matching engine + live Coinbase market data), and Cernio (job-discovery Session 9). Hover over the project chips for more, or click into a quadrant to see everything.";
   const displayedDescription =
     hoveredProject !== null
       ? highlightedProjects[hoveredProject].description
