@@ -218,7 +218,7 @@ export function Quadrant({
             animate={labelAnimateVariants}
             exit={labelExitVariants}
             transition={labelTransition}
-            className="text-4xl font-bold text-gradient-purple py-2"
+            className="text-3xl font-bold text-gradient-purple py-2 px-4 text-center text-balance"
           >
             {label}
           </motion.h2>

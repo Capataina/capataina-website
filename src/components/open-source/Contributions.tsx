@@ -2,7 +2,9 @@ import { memo, useMemo } from "react";
 import { Contribution } from "./Contribution";
 import type { Contribution as ContributionType } from "@/types";
 import { burnAFine } from "@/content/open-source/burn-a-fine";
+import { burnFold4d } from "@/content/open-source/burn-fold4d";
 import { tinygradOnnxLstm } from "@/content/open-source/tinygrad-onnx-lstm";
+import { alloyJsonRpcRecursion } from "@/content/open-source/alloy-jsonrpc-recursion";
 import { gameMods } from "@/content/open-source/game-mods";
 
 interface ContributionsProps {
@@ -21,7 +23,9 @@ export const Contributions = memo(function Contributions({
 }: ContributionsProps) {
   const allContributions: ContributionType[] = [
     burnAFine,
+    burnFold4d,
     tinygradOnnxLstm,
+    alloyJsonRpcRecursion,
     gameMods,
   ];
 

@@ -24,8 +24,7 @@ export const Certificate = memo(function Certificate({
   // Memoize animation variants
   const listItemHoverVariants = useMemo(
     () => ({
-      x: 4,
-      scale: 1.01,
+      x: 2,
       transition: { duration: 0.1 },
     }),
     []
