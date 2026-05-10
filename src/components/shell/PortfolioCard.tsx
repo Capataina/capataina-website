@@ -1,45 +1,53 @@
 "use client";
 
 import { motion, AnimatePresence } from "motion/react";
-import { Download, GitBranch, Github, Linkedin } from "lucide-react";
-import { Cpu, Brain, Sparkles } from "lucide-react";
+import {
+  Brain,
+  Download,
+  Github,
+  Image as ImageIcon,
+  LineChart,
+  Linkedin,
+  type LucideIcon,
+  Terminal,
+} from "lucide-react";
 import { useState, useMemo } from "react";
 
 interface HighlightedProject {
   title: string;
-  icon: any;
+  icon: LucideIcon;
   link: string;
   description: string;
 }
 
 const highlightedProjects: HighlightedProject[] = [
   {
-    title: "Nyquestro",
-    icon: Cpu,
-    link: "https://github.com/Capataina/Nyquestro",
+    title: "Cernio",
+    icon: Terminal,
+    link: "https://github.com/Capataina/Cernio",
     description:
-      "Lock-free low-latency limit order book and matching engine exploring market microstructure, price-time priority, and ultra-fast order processing in safe Rust.",
+      "Local-first job-discovery TUI in Rust + Ratatui — combines mechanical ATS scanning across hundreds of companies with conversational Claude-assisted evaluation against a structured candidate profile, all backed by WAL-mode SQLite.",
+  },
+  {
+    title: "Aurix",
+    icon: LineChart,
+    link: "https://github.com/Capataina/Aurix",
+    description:
+      "Local-first Tauri 2 DeFi analytics platform — Uniswap V3 LP backtester with Q64.96 fixed-point math, cross-DEX arbitrage detection, hand-crafted ABI encoding, and quantitative risk modelling running entirely on free public RPC endpoints.",
+  },
+  {
+    title: "NeuroDrive",
+    icon: Brain,
+    link: "https://github.com/Capataina/NeuroDrive",
+    description:
+      "Brain-inspired continual-learning substrate in Rust + Bevy — Hebbian plasticity, STDP eligibility traces, dopamine-modulated weight updates, and structural plasticity inside a deterministic 2D racing environment, deliberately built without backpropagation or ML frameworks.",
   },
   {
     title: "Image Browser",
-    icon: Brain,
+    icon: ImageIcon,
     link: "https://github.com/Capataina/PinterestStyleImageBrowser",
     description:
-      "A Pinterest-style image browsing app built using Tauri. Features CLIP powered semantic and image similarity search options as well as local image embedding generation.",
-  },
-  {
-    title: "Vynapse",
-    icon: Sparkles,
-    link: "https://github.com/Capataina/Vynapse",
-    description:
-      "A neuroevolution and deep learning framework built from scratch in Rust, inspired by Pytorch, Tensorflow, Deap and NEAT.",
-  },
-  {
-    title: "Chrona",
-    icon: GitBranch,
-    link: "https://github.com/Capataina/Chrona",
-    description:
-      "A lightweight, high-performance git clone written as a learning project. Implements core git features with a focus on speed and efficiency using C++.",
+      "Local-first Pinterest-style image manager built around a 3-encoder semantic-search ensemble (CLIP, DINOv2, SigLIP-2) combined via Reciprocal Rank Fusion, with WAL-mode SQLite background indexing and typed Tauri 2 IPC envelopes — fully offline, privacy-preserving by design.",
   },
 ];
 
@@ -55,7 +63,7 @@ export function PortfolioCard({
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
 
   const defaultDescription =
-    "I am currently most actively developing Pinterest Style Image Browser. If you want to find out more about my projects, hover over them, click on them or click on the quadrants to explore!";
+    "Currently shipping NeuroDrive (M6 brain-substrate), Aurix (Vector A V3 LP backtester audited 2026-05), and Cernio (job-discovery Session 9). Hover over the project chips for more, or click into a quadrant to see everything.";
   const displayedDescription =
     hoveredProject !== null
       ? highlightedProjects[hoveredProject].description

@@ -1,6 +1,8 @@
-export const xyntra = {
-  title: "Xyntra — ML Graph Fusion Compiler Pass",
-  date: "2025 (In Progress)",
+import type { Project } from "@/types";
+
+export const xyntra: Project = {
+  title: "Xyntra — ML graph fusion compiler with WGSL/PTX codegen",
+  date: "2024 – present",
   fields: [
     "Applied AI & ML Infrastructure Engineer",
     "Systems & Infrastructure Engineer",
@@ -9,15 +11,15 @@ export const xyntra = {
     github: "https://github.com/Capataina/Xyntra",
   },
   description: [
-    "Designing compiler pass for ONNX and TorchScript graph fusion to reduce GPU overhead",
-    "Uses e-graph rewriting to identify kernel fusion opportunities automatically",
-    "Plans WGSL and PTX code generation backends with autotuned tile sizes",
+    "ML graph-fusion compiler pass using e-graph rewriting to identify kernel-fusion opportunities and emit optimised WGSL or PTX kernels for ONNX and TorchScript models",
+    "Targets an inference path that bypasses general-purpose graph executors — same forward pass, fewer kernel launches, fewer memory round-trips",
+    "Currently a typed IR + stub validator with the e-graph rewriting and WGSL/PTX backends as the next two milestones",
   ],
-  techStack: "Rust, ONNX",
+  techStack: "Rust, ONNX, e-graphs, WGSL, PTX",
   technicalDetails: [
-    "Type-safe IR with NodeID, TensorShape, OpKind primitives, and graph representation",
-    "Validation framework with cycle detection, shape compatibility, and operation constraints",
-    "E-graph rewriting for pattern matching and fusion legality analysis",
-    "GPU code generation for fused kernels targeting WGSL and PTX (early foundation stage)",
+    "Type-safe IR — NodeID, TensorShape, OpKind primitives — every node in the graph is a typed enum that surfaces shape/op mismatches at compile time, not at the codegen step",
+    "Validation framework with cycle detection, shape-compatibility propagation, and operation-constraint checks; the IR refuses to lower a graph that violates any structural invariant",
+    "E-graph rewriting layer for pattern-matching fusion opportunities — equivalent fragments share an e-class, so non-local rewrites become local pattern matches over the e-class graph",
+    "Planned WGSL + PTX backends with autotuned tile sizes — fused kernels emitted directly, bypassing the general-purpose ONNX runtime executor for the inference path",
   ],
 };

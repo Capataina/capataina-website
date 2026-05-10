@@ -1,6 +1,8 @@
-export const tectra = {
-  title: "Tectra — High-Performance Hybrid Trading Infrastructure",
-  date: "2025 (In Progress)",
+import type { Project } from "@/types";
+
+export const tectra: Project = {
+  title: "Tectra — Production-shape trading infrastructure scaffold in C++",
+  date: "2024 – present",
   fields: [
     "Low Level Financial Systems Engineer",
     "Systems & Infrastructure Engineer",
@@ -9,15 +11,15 @@ export const tectra = {
     github: "https://github.com/Capataina/Tectra",
   },
   description: [
-    "Designing modular trading infrastructure for production-grade finance applications",
-    "Includes market data feed handler, pre-trade risk engine, kill-switch, and deterministic replay",
-    "Targets >1M messages/second per core with microsecond-level risk checks",
+    "Production-style trading infrastructure scaffold combining a market-data feed handler, a pre-trade risk engine, a strategy execution framework, a backtesting engine, and a deterministic replay system in C++",
+    "Targets the architectural shape of real exchange-connected trading systems — dual-plane design with a binary fast path for sub-microsecond decision making and a structured control plane for management",
+    "Designed around the constraint that a strategy that passes backtest must be bit-identical when replayed on the same historical session — replay determinism is the load-bearing test discipline",
   ],
-  techStack: "Rust",
+  techStack: "C++, FlatBuffers, Prometheus, ITCH",
   technicalDetails: [
-    "ITCH decoder with zero-copy parsing, gap detection, and L2 book reconstruction",
-    "Hot-reloadable risk rules (price bands, size limits, throttles) without downtime",
-    "Append-only checksummed journals for post-incident root-cause analysis",
-    "Dual-plane architecture: binary fast path for low-latency + structured control plane for management",
+    "ITCH decoder with zero-copy parsing, gap detection, and L2 book reconstruction — every message is interpreted in place against the wire layout, no per-message allocations on the hot path",
+    "Hot-reloadable risk rules — price bands, size limits, throttles all live in a config layer the engine reloads atomically without dropping market data, so risk policy changes never require downtime",
+    "Append-only checksummed journals — every order, every fill, every market-data event is durably logged with end-to-end checksums, supporting post-incident root-cause analysis without ambiguity",
+    "Dual-plane architecture: binary fast path for low-latency decisions, structured control plane for management — the two planes share data structures via FlatBuffers schemas so debugging tools can read the fast-path state without slowing it down",
   ],
 };

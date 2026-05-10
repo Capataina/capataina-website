@@ -1,15 +1,20 @@
 import { memo, useMemo } from "react";
 import { Project } from "./Project";
+import type { Project as ProjectType } from "@/types";
+import { aurix } from "@/content/projects/aurix";
+import { cernio } from "@/content/projects/cernio";
+import { neurodrive } from "@/content/projects/neurodrive";
 import { imageBrowser } from "@/content/projects/image-browser";
+import { nyquestro } from "@/content/projects/nyquestro";
 import { tectra } from "@/content/projects/tectra";
+import { neuronika } from "@/content/projects/neuronika";
 import { vynapse } from "@/content/projects/vynapse";
 import { xyntra } from "@/content/projects/xyntra";
 import { zyphos } from "@/content/projects/zyphos";
-import { nyquestro } from "@/content/projects/nyquestro";
-import { multiLlmDebate } from "@/content/projects/multi-llm-debate";
+import { chrona } from "@/content/projects/chrona";
+import { consilium } from "@/content/projects/consilium";
 import { asteroidsAI } from "@/content/projects/asteroids-ai";
 import { fraudDetection } from "@/content/projects/fraud-detection";
-import { neuronika } from "@/content/projects/neuronika";
 import { personalWebsite } from "@/content/projects/personal-website";
 
 interface ProjectsProps {
@@ -17,26 +22,37 @@ interface ProjectsProps {
 }
 
 export const Projects = memo(function Projects({ field }: ProjectsProps) {
-  const allProjects = [
+  const allProjects: ProjectType[] = [
+    aurix,
+    cernio,
+    neurodrive,
     imageBrowser,
+    nyquestro,
     tectra,
+    neuronika,
     vynapse,
     xyntra,
     zyphos,
-    nyquestro,
-    multiLlmDebate,
+    chrona,
+    consilium,
     asteroidsAI,
     fraudDetection,
-    neuronika,
     personalWebsite,
   ];
 
-  // Filter projects based on the field - memoized
+  // Filter projects based on the field - memoized.
+  // Featured projects float to the top; remaining sorted alphabetically.
   const projects = useMemo(
     () =>
       allProjects
-        .filter((project) => project.fields.includes(field))
-        .sort((a, b) => a.title.localeCompare(b.title)),
+        .filter((project) =>
+          project.fields.includes(field as ProjectType["fields"][number])
+        )
+        .sort((a, b) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return a.title.localeCompare(b.title);
+        }),
     [field]
   );
 

@@ -3,6 +3,7 @@ import { Contribution } from "./Contribution";
 import type { Contribution as ContributionType } from "@/types";
 import { burnAFine } from "@/content/open-source/burn-a-fine";
 import { burnFold4d } from "@/content/open-source/burn-fold4d";
+import { burnTensorContainerPanic } from "@/content/open-source/burn-tensor-container-panic";
 import { tinygradOnnxLstm } from "@/content/open-source/tinygrad-onnx-lstm";
 import { alloyJsonRpcRecursion } from "@/content/open-source/alloy-jsonrpc-recursion";
 import { gameMods } from "@/content/open-source/game-mods";
@@ -24,6 +25,7 @@ export const Contributions = memo(function Contributions({
   const allContributions: ContributionType[] = [
     burnAFine,
     burnFold4d,
+    burnTensorContainerPanic,
     tinygradOnnxLstm,
     alloyJsonRpcRecursion,
     gameMods,
