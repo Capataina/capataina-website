@@ -5,6 +5,7 @@ export const systemsProgramming: Skill = {
   fields: [
     "Systems & Infrastructure Engineer",
     "Low Level Financial Systems Engineer",
+    "Open Source Engineer",
   ],
   subskills: [
     "Rust",
@@ -22,5 +23,6 @@ export const systemsProgramming: Skill = {
     "Async Tokio runtime patterns across multiple projects (Cernio, Aurix, Nyquestro) — concurrent I/O without blocking, careful lifetime management on shared state",
     "Zero-copy parsing patterns — ITCH decoder reads in place against the wire layout (Tectra), binary protocol decoders avoid allocations on the hot path",
     "Newtype-driven type safety — OrderID, Price (cents), Quantity, nanosecond Timestamp all distinct types so unit-confusion bugs surface at compile time, not at production",
+    "Open-source contributions across Rust systems projects — Burn (tracel-ai/burn) ablation regression + fold4d reshape + tensor-container panic fix, Alloy (alloy-rs/alloy) JSON-RPC recursion-limit fix — reading and patching production Rust codebases without ownership of the project",
   ],
 };

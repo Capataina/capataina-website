@@ -14,6 +14,7 @@ import { linuxDevOps } from "@/content/skills/linux-devops";
 import { cybersecurityNetworking } from "@/content/skills/cybersecurity-networking";
 import { mathematicsOptimization } from "@/content/skills/mathematics-optimization";
 import { gameDevelopment } from "@/content/skills/game-development";
+import { openSourceEngagement } from "@/content/skills/open-source-engagement";
 
 interface SkillsProps {
   field: string;
@@ -32,6 +33,7 @@ const allSkills: SkillType[] = [
   linuxDevOps,
   webDevelopment,
   gameDevelopment,
+  openSourceEngagement,
 ];
 
 export const Skills = memo(function Skills({ field }: SkillsProps) {

@@ -5,6 +5,7 @@ export const gameDevelopment: Skill = {
   fields: [
     "Applied AI & ML Infrastructure Engineer",
     "Systems & Infrastructure Engineer",
+    "Open Source Engineer",
   ],
   subskills: [
     "Bevy",

@@ -6,6 +6,7 @@ export const linuxDevOps: Skill = {
     "Systems & Infrastructure Engineer",
     "Applied AI & ML Infrastructure Engineer",
     "Low Level Financial Systems Engineer",
+    "Open Source Engineer",
   ],
   subskills: [
     "Arch Linux",
