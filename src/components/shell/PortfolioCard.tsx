@@ -415,19 +415,32 @@ export function PortfolioCard({
             })}
           </motion.div>
 
-          {/* Dynamic Description */}
-          <div className="overflow-hidden h-12 flex items-center justify-center">
-            <motion.p
-              key={hoveredProject}
-              initial={descriptionInitialVariants}
-              animate={descriptionAnimateVariants}
-              exit={descriptionExitVariants}
-              transition={descriptionTransition}
-              className="text-gray-300 text-xs leading-relaxed text-center"
-            >
-              {displayedDescription}
-            </motion.p>
-          </div>
+          {/* Dynamic Description — auto-height; the wrapper's `layout`
+              prop animates the height change as the description text
+              swaps. The outer card has `layout="size"`, so it picks up
+              the size delta and the card itself grows / shrinks
+              smoothly. AnimatePresence with `mode="wait"` cross-fades
+              between descriptions: old fades out, new fades in. */}
+          <motion.div
+            layout
+            transition={{
+              layout: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+            }}
+            className="flex items-center justify-center min-h-[3rem] overflow-hidden"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.p
+                key={hoveredProject ?? "default"}
+                initial={descriptionInitialVariants}
+                animate={descriptionAnimateVariants}
+                exit={descriptionExitVariants}
+                transition={descriptionTransition}
+                className="text-gray-300 text-xs leading-relaxed text-center"
+              >
+                {displayedDescription}
+              </motion.p>
+            </AnimatePresence>
+          </motion.div>
         </motion.div>
       </motion.div>
     </motion.div>
