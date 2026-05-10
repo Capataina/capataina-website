@@ -1,5 +1,4 @@
 import type { Article } from "@/types";
-import { formattingTest } from "./_formatting-test";
 
 // NeuroDrive
 import { neurodrive43xCacheSpeedup } from "./neurodrive/43x-cache-speedup";
@@ -83,8 +82,6 @@ export const allArticles: Article[] = [
   portfolioStrategy,
   websiteArchitecture,
   localFirstPrinciple,
-  // Test article — left in until production launch
-  formattingTest,
 ];
 
 /** Lookup helper used by the article view when reading `?article=<slug>`. */
