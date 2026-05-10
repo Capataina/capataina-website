@@ -1,18 +1,18 @@
 import { memo, useMemo } from "react";
 import { Accordion } from "@/components/ui/accordion";
 import { Skill } from "./Skill";
-import { machineLearning } from "@/skills/machine-learning";
-import { webDevelopment } from "@/skills/web-development";
-import { desktopDevelopment } from "@/skills/desktop-development";
-import { systemsProgramming } from "@/skills/systems-programming";
-import { networkingProtocols } from "@/skills/networking-protocols";
-import { dataEngineering } from "@/skills/data-engineering";
-import { compilerGPU } from "@/skills/compiler-gpu";
-import { largeLanguageModels } from "@/skills/large-language-models";
-import { linuxDevOps } from "@/skills/linux-devops";
-import { cybersecurityNetworking } from "@/skills/cybersecurity-networking";
-import { mathematicsOptimization } from "@/skills/mathematics-optimization";
-import { gameDevelopment } from "@/skills/game-development";
+import { machineLearning } from "@/content/skills/machine-learning";
+import { webDevelopment } from "@/content/skills/web-development";
+import { desktopDevelopment } from "@/content/skills/desktop-development";
+import { systemsProgramming } from "@/content/skills/systems-programming";
+import { networkingProtocols } from "@/content/skills/networking-protocols";
+import { dataEngineering } from "@/content/skills/data-engineering";
+import { compilerGPU } from "@/content/skills/compiler-gpu";
+import { largeLanguageModels } from "@/content/skills/large-language-models";
+import { linuxDevOps } from "@/content/skills/linux-devops";
+import { cybersecurityNetworking } from "@/content/skills/cybersecurity-networking";
+import { mathematicsOptimization } from "@/content/skills/mathematics-optimization";
+import { gameDevelopment } from "@/content/skills/game-development";
 
 interface SkillsProps {
   field: string;

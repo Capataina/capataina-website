@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { Education } from "./Education";
-import { universityOfYork } from "@/educations/university-of-york";
+import { universityOfYork } from "@/content/educations/university-of-york";
 
 interface EducationsProps {
   field: string;

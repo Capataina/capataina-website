@@ -1,10 +1,10 @@
 import { memo, useMemo } from "react";
 import { Certificate } from "./Certificate";
-import { dataCamp } from "@/certificates/datacamp";
-import { deepLearningAI } from "@/certificates/deeplearning-ai";
-import { googleDeveloper } from "@/certificates/google-developer";
-import { cmeGroup } from "@/certificates/cme-group";
-import { hackTheBox } from "@/certificates/hackthebox";
+import { dataCamp } from "@/content/certificates/datacamp";
+import { deepLearningAI } from "@/content/certificates/deeplearning-ai";
+import { googleDeveloper } from "@/content/certificates/google-developer";
+import { cmeGroup } from "@/content/certificates/cme-group";
+import { hackTheBox } from "@/content/certificates/hackthebox";
 
 interface CertificatesProps {
   field: string;

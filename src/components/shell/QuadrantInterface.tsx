@@ -1,7 +1,7 @@
-import { Projects } from "./Projects";
-import { Skills } from "./Skills";
-import { Educations } from "./Educations";
-import { Certificates } from "./Certificates";
+import { Projects } from "@/components/projects/Projects";
+import { Skills } from "@/components/skills/Skills";
+import { Educations } from "@/components/educations/Educations";
+import { Certificates } from "@/components/certificates/Certificates";
 import { X } from "lucide-react";
 
 interface QuadrantInterfaceProps {

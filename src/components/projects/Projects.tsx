@@ -1,17 +1,17 @@
 import { memo, useMemo } from "react";
 import { Project } from "./Project";
-import { imageBrowser } from "@/projects/image-browser";
-import { tectra } from "@/projects/tectra";
-import { vynapse } from "@/projects/vynapse";
-import { xyntra } from "@/projects/xyntra";
-import { zyphos } from "@/projects/zyphos";
-import { nyquestro } from "@/projects/nyquestro";
-import { multiLlmDebate } from "@/projects/multi-llm-debate";
-import { asteroidsAI } from "@/projects/asteroids-ai";
-import { fraudDetection } from "@/projects/fraud-detection";
-import { gameMods } from "@/projects/game-mods";
-import { neuronika } from "@/projects/neuronika";
-import { personalWebsite } from "@/projects/personal-website";
+import { imageBrowser } from "@/content/projects/image-browser";
+import { tectra } from "@/content/projects/tectra";
+import { vynapse } from "@/content/projects/vynapse";
+import { xyntra } from "@/content/projects/xyntra";
+import { zyphos } from "@/content/projects/zyphos";
+import { nyquestro } from "@/content/projects/nyquestro";
+import { multiLlmDebate } from "@/content/projects/multi-llm-debate";
+import { asteroidsAI } from "@/content/projects/asteroids-ai";
+import { fraudDetection } from "@/content/projects/fraud-detection";
+import { gameMods } from "@/content/projects/game-mods";
+import { neuronika } from "@/content/projects/neuronika";
+import { personalWebsite } from "@/content/projects/personal-website";
 
 interface ProjectsProps {
   field: string;

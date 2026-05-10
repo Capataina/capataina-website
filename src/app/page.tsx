@@ -1,8 +1,8 @@
 "use client";
 
-import { Quadrant } from "@/components/Quadrant";
-import { ParticleNetwork } from "@/components/ParticleNetwork";
-import { PortfolioCard } from "@/components/PortfolioCard";
+import { Quadrant } from "@/components/shell/Quadrant";
+import { ParticleNetwork } from "@/components/shell/ParticleNetwork";
+import { PortfolioCard } from "@/components/shell/PortfolioCard";
 import {
   AccentColorProvider,
   QuadrantTheme,
