@@ -24,6 +24,12 @@
 .DS_Store
 *.pem
 
+# media artefacts (screen recordings, demos, upload-ready video)
+*.mov
+*.mp4
+*.webm
+*.mkv
+
 # debug
 npm-debug.log*
 yarn-debug.log*

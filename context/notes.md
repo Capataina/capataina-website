@@ -169,6 +169,35 @@ The site runs at full visual richness and the optimisations are all of the "do l
 
 If a future change degrades any of these (e.g. accidentally importing `* as motion`), the analyzer will surface it.
 
+## Articles surface — MDX since 2026-06-02
+
+The articles surface migrated from `react-markdown` + string bodies to `@next/mdx` + ComponentType bodies in commit `c72eeaa` (version 0.1.0 → 0.2.0). The visual primitives (headings, callouts, code, tables, ASCII art) render identically — the migration was the source format, not the rendering. The shift unlocked inline JSX widgets in article bodies without inventing a marker mini-language.
+
+Concrete moving parts:
+
+- `next.config.ts` wraps the export with `withMDX` from `@next/mdx`. Plugin references are passed as **string-name tuples** (not function references — Turbopack rejects non-serialisable loader options). `remarkPlugins: [["remark-gfm", {}]]`, `rehypePlugins: [["rehype-slug", {}]]`. The custom `remark-callouts.ts` plugin remains in the tree as orphan (function-reference; Turbopack rejected it).
+- `src/mdx-components.tsx` exports `useMDXComponents` which returns the existing `markdownComponents` map verbatim. Next.js auto-discovers this file at project root.
+- `pageExtensions: ["ts", "tsx", "mdx"]` enables `.mdx` files anywhere in the source tree.
+- `src/types/article.ts` — `Article.body: ComponentType` (was `string` before the migration).
+- `src/content/articles/<cluster>/<slug>.mdx` carries the body; sibling `<slug>.ts` imports the MDX default export and exports the `Article` metadata wrapper.
+- `ArticleView.tsx` renders `<article.body />` directly; the `MarkdownRenderer` component was deleted.
+- `extract-headings.ts` exports `extractHeadingsFromDom(root: HTMLElement)` — walks the rendered DOM via `querySelectorAll("h1, h2, …, h6")` after mount. The prior regex-on-source approach is gone (MDX has no source to parse at runtime).
+- 29 placeholder articles deleted in the same commit. Currently the surface ships **one** article: `burn-afine-pr.mdx`.
+
+### Inline widget system
+
+10 inline widgets at `src/components/articles/widgets/` — all share the `AnsiBox` wrapper for the dark-glass + monospace aesthetic that matches the site's code-block style. Each widget is currently article-specific (the A-FINE article uses all 10); the rule until a second article shows up is "leave them as-is, extract shared primitives when reuse actually demands it" — per the global CLAUDE.md "three similar lines is better than a premature abstraction" guidance.
+
+Widget inventory: `AnsiBox`, `Timeline`, `FileLocBars`, `CoverageGauge`, `MaintainerQuote`, `GeluComparison`, `RatioCollapse`, `PrPrecedentTree`, `PipelineWalker`, `AdapterHeatmap`, `MetricComparison`. The widgets follow three project preferences captured in auto-memory:
+
+- ANSI aesthetic — see auto-memory `feedback_ansi_widget_aesthetic.md`
+- Placement adjacent to the concept they help explain — see `feedback_widget_placement_principle.md`
+- Audience-aware framing in the article prose, around the widget — see `feedback_explain_for_everyday_bystander.md`
+
+### What didn't change
+
+- The list view geometry, the URL sync (`?article=<slug>`), the cascading TOC scroll-spy, the L-shape quadrant clip-paths, the cascade-fade animation, the layout-mode toggle — all unchanged by the MDX migration. The migration was the body pipeline, not the article surface.
+
 ## External pointers
 
 - `~/.claude/CLAUDE.md` — the global principal-engineering personality. Loaded in every session; the project-local CLAUDE.md is additive.
