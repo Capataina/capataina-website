@@ -1,0 +1,481 @@
+import {
+  Timeline,
+  FileLocBars,
+  CoverageGauge,
+  MaintainerQuote,
+  GeluComparison,
+  RatioCollapse,
+  PrPrecedentTree,
+  PipelineWalker,
+  AdapterHeatmap,
+  MetricComparison,
+} from "@/components/articles/widgets";
+
+# A-FINE for Burn: shipping a CVPR 2025 image-quality metric into a Rust ML framework
+
+This is the story of [PR #4894](https://github.com/tracel-ai/burn/pull/4894): 1,864 lines of Rust merged into [tracel-ai/burn](https://github.com/tracel-ai/burn) on 2026-05-11. The PR adds A-FINE, an image-quality metric from a CVPR 2025 paper, to the Rust deep-learning framework's metric catalogue.
+
+It is also, deliberately, a long-form walkthrough of how the work happened — the design calls, the maintainer conversation, the implementation traps, the math, the review. The bar this piece sets for itself is that an engineer should be able to learn how A-FINE works by reading it, and a curious bystander should still come away knowing what the contribution was and why it mattered.
+
+<MaintainerQuote handle="laggui" role="tracel-ai/burn maintainer" date="2026-05-07">
+  LGTM! Your response time was totally fine btw 😄
+</MaintainerQuote>
+
+That is what landing the work looked like at the end. Getting there took two months, four precedent PRs of study, a 25-day silence, an inlined Vision Transformer, and a small handful of debugging traps that only show up when you port a paper across frameworks. Here is all of it.
+
+## The one-paragraph summary
+
+A-FINE — short for **Adaptive Fidelity-Naturalness Evaluator** — is an image-quality metric. You feed it two images, a reference and a distorted version of the reference, and it scores how good the distorted one is on a scale that correlates with human judgement. What makes A-FINE different from older metrics like PSNR or SSIM is that it does not assume the reference image is itself perfect. When the reference is also low-quality, A-FINE quietly down-weights the "how faithful is the distorted image to this reference" signal and gives more weight to "how natural does the distorted image look on its own". That adaptive blend is where the design intelligence lives, and shipping it into Burn meant porting a CLIP-based Vision Transformer, two assessment heads, a five-parameter calibrator, and an adapter into the Rust framework without depending on anything outside of it.
+
+## What it is, in plain terms
+
+Imagine you have two photos of the same cat. One is the original. The other has been compressed too hard for WhatsApp and looks a bit smudgy. How much worse is the second one?
+
+You could measure the per-pixel difference and report a number. That is essentially what **PSNR** does, and it has a problem: shift the second photo one pixel to the right and the per-pixel difference explodes, even though a human would say nothing meaningful changed. PSNR gives you the wrong answer there.
+
+You could measure structural similarity — how the local patches of the image line up — and report a number. That is **SSIM**, and it is better than PSNR for most common distortions, but it still falls down on things like blur (it over-penalises) and on situations where the reference image is *itself* not all that good (it has no opinion about that — it just measures similarity).
+
+A-FINE is the next step out. It runs both images through a CLIP Vision Transformer (a neural network pre-trained to understand image content), pulls out feature representations from a middle layer, and then asks two separate questions:
+
+1. **Fidelity** — how close are the two feature representations to each other?
+2. **Naturalness** — how plausible does each image look on its own, independent of the other?
+
+Then it blends those two answers together. The blend is the *adaptive* part: when the reference image looks high-quality (high naturalness), fidelity carries most of the score. When the reference image is itself bad, naturalness of the distorted image starts to matter more. That asymmetric blend is what the paper introduces, and it lets A-FINE handle modern situations — generative enhancement methods that produce outputs *better* than the reference, super-resolution methods running on already-blurry inputs — that classical full-reference metrics get wrong.
+
+<MetricComparison />
+
+The widget above is a small interactive sketch of the same idea. Drag the slider, pick a distortion. PSNR collapses on translation while SSIM and A-FINE both hold; SSIM over-penalises blur while A-FINE softens the curve. The numbers are illustrative — the *shape* of the disagreement is the real point.
+
+## The paper, briefly
+
+| Field | Value |
+|---|---|
+| Title | Toward Generalized Image Quality Assessment: Relaxing the Perfect Reference Quality Assumption |
+| Authors | Du Chen, Tianhe Wu, Kede Ma, Lei Zhang |
+| Affiliations | PolyU, CityU, OPPO |
+| Venue | CVPR 2025 |
+| arXiv | [2503.11221](https://arxiv.org/abs/2503.11221) |
+| Project page | [tianhewu.github.io/A-FINE-page](https://tianhewu.github.io/A-FINE-page.github.io/) |
+| Reference Python | [ChrisDud0257/AFINE](https://github.com/ChrisDud0257/AFINE) (Apache-2.0) |
+
+The headline contribution: **relaxing the perfect-reference assumption**. Classical full-reference IQA assumes the reference image is itself ideal. Modern imaging pipelines violate that assumption all the time. The paper introduces a large dataset (DiffIQA, ~180,000 diffusion-enhanced images with worse/similar/better human annotations) and a small benchmark (SRIQA-Bench, 100 references × 10 super-resolution methods) and shows that A-FINE outperforms standard FR-IQA models on both.
+
+For Burn, the relevant fact is that A-FINE is a well-defined, reproducible neural metric with public weights — exactly the shape that fits next to LPIPS, DISTS, and FID in the framework's `burn-train::metric::vision` module.
+
+## Where this PR comes from
+
+`tracel-ai/burn` keeps a long-running [Image Quality Metrics meta-issue (#4312)](https://github.com/tracel-ai/burn/issues/4312) where new metrics get proposed and claimed by contributors. The pattern: someone posts a checklist item, someone else comments "I'll take on X", a maintainer (usually `laggui`) confirms, and the metric ships as a PR a few weeks later. The merged ones get linked back into the checklist as templates for the next contributor.
+
+By the time A-FINE got proposed, four perceptual metrics had already landed on this exact path:
+
+<PrPrecedentTree
+  rootPr={4894}
+  rootLabel="A-FINE — Adaptive Fidelity-Naturalness Evaluator"
+  precedents={[
+    { pr: 4403, metric: "LPIPS", note: "perceptual metric with inlined backbone — closest analogue" },
+    { pr: 4574, metric: "DISTS", note: "perceptual metric with PyTorch-weight import" },
+    { pr: 4595, metric: "Gram Matrix", note: "style/perceptual loss with PyTorch weights" },
+    { pr: 4644, metric: "FID", note: "heaviest precedent — InceptionV3 inlined for FID" },
+  ]}
+/>
+
+The tree above isn't decoration. Each of those PRs is a worked example of how to ship a CLIP-or-Inception-flavoured metric into Burn: where the code goes, how the weight loader handles the PyTorch tensors, how the tests are structured. The contributor culture explicitly expects you to read your precedents before opening a PR — the meta-issue checklist links to each merged PR so newcomers can pattern-match.
+
+I claimed A-FINE on 2026-03-25 with a one-line comment on the meta-issue. `laggui` confirmed about an hour later with a five-word reply.
+
+<MaintainerQuote handle="laggui" role="tracel-ai/burn maintainer" date="2026-03-25">
+  Yeah it should be up for graps!
+</MaintainerQuote>
+
+That short reply is the entire claim protocol. No CLA gating, no design-doc review, no "open an issue first". The trust default in this repo is high; the maintainers expect contributors to do their homework on the precedent PRs and come back with code.
+
+## The 25-day silence — and how it resolved
+
+I disappeared for 25 days.
+
+That part is not in the PR description and would normally not belong in a writeup like this. I am putting it in because the way it resolved is the more interesting engineering lesson than the code is. While I was off the meta-issue, other contributors were shipping metrics at one or two per fortnight. A long silence on a claim is, in most contributor cultures, the moment your name gets quietly written off and someone else picks the item up.
+
+Here is what the silence actually contained: I was reading. Specifically, I was reading the four precedent PRs above (LPIPS, DISTS, Gram, FID) line by line, reading Burn's `burn-store` crate (its PyTorch-compatibility layer) to understand how the existing metrics load weights, and reading the reference Python implementation from the [PyIQA](https://github.com/chaofengc/IQA-PyTorch) library to understand A-FINE's actual forward pass at the tensor level.
+
+On day 25 I came back to the meta-issue with a long message. Not an apology; a set of technical questions. Should A-FINE ship as a single large PR or as a backbone-first PR followed by the metric on top? Should the CLIP ViT be inlined or carved out as a reusable component? Should the implementation follow the LPIPS pattern of a frozen-weight encoder, or the FID pattern of an InceptionV3 wrapper?
+
+`laggui` replied four days later with directional guidance: single PR, inline the CLIP ViT, follow the LPIPS template. The 25-day silence didn't damage the engagement at all because the comeback message demonstrated the silence had been spent on real work.
+
+<Timeline
+  label="THE FULL TIMELINE"
+  events={[
+    {
+      date: "2026-03-25",
+      label: "claimed the issue",
+      actor: "Caner",
+      detail: "Posted a one-line claim on meta-issue #4312 asking to tackle A-FINE.",
+    },
+    {
+      date: "2026-03-25",
+      label: "maintainer confirmed",
+      actor: "laggui",
+      detail: "Confirmed within the hour — \"Yeah it should be up for graps!\". No design-doc review. The trust default in this repo is high.",
+    },
+    {
+      date: "2026-04-19",
+      label: "re-engaged after silence",
+      actor: "Caner",
+      detail: "Broke the 25-day silence with technical questions: PR sizing, CLIP ViT inlining vs reusable backbone, which precedent to follow.",
+    },
+    {
+      date: "2026-04-23",
+      label: "strategy locked",
+      actor: "laggui",
+      detail: "Replied with directional guidance: single PR, inline the CLIP ViT, follow LPIPS pattern. The strategy was locked in this message.",
+    },
+    {
+      date: "2026-04-28",
+      label: "PR opened",
+      actor: "Caner",
+      detail: "Opened PR #4894: +1,864 lines, 10 files. CLIP ViT, two assessment heads, calibrator, adapter, weight loader, module wiring.",
+    },
+    {
+      date: "2026-05-05",
+      label: "review acknowledged",
+      actor: "laggui",
+      detail: "\"Just letting you know I am aware of this PR but haven't gotten around to it yet; bigger PRs require a bit more context switching.\"",
+    },
+    {
+      date: "2026-05-06",
+      label: "changes requested",
+      actor: "laggui",
+      detail: "CHANGES_REQUESTED. One comment: refactor forward_with_features to return a typed ClipOutput { features, cls: Option<...> } struct so future CLIP-based metrics can reuse the backbone activations.",
+    },
+    {
+      date: "2026-05-07",
+      label: "refactor approved",
+      actor: "laggui",
+      detail: "Pushed the refactor that morning. APPROVED later the same afternoon — \"LGTM! Your response time was totally fine btw\".",
+    },
+    {
+      date: "2026-05-11",
+      label: "merged to main",
+      actor: "tracel-team",
+      detail: "Merged at 13:10 UTC, four days after approval. 9 days end-to-end from PR open to merge.",
+    },
+  ]}
+/>
+
+The lesson — which generalises beyond this specific contribution — is that long silences are survivable if the comeback is technical depth rather than process apology. The lower-cost path is still an interim status comment within the first two weeks of any claim, but if you blow past that, what saves you is showing the silence had been spent on the work.
+
+## The strategy call
+
+The decision that mattered most was the one we settled on 2026-04-23: **single PR, inline the CLIP ViT, follow LPIPS's pattern**.
+
+The alternative — a backbone-first PR that adds a reusable CLIP-ViT module, then a follow-up PR that adds A-FINE on top of it — would have been more "correct" in an abstract software-engineering sense. Future CLIP-based metrics could share the backbone. The PR would be smaller and easier to review. The architectural separation would be cleaner.
+
+We rejected it for three reasons:
+
+| Reason | Why |
+|---|---|
+| Precedent | LPIPS, DISTS, FID all ship as single-PR inlined-backbone implementations. The reviewers know how to read that shape. A novel two-PR pattern would introduce friction without enough payoff. |
+| Reusability is speculative | At the moment of the PR, A-FINE was the only metric that needed a CLIP ViT. Building a reusable component on n=1 is a textbook over-abstraction risk. |
+| Cost asymmetry | Inlining now and extracting later when a second CLIP-based metric arrives is cheap. Building the reusable abstraction now and discovering it doesn't fit the second metric's needs is expensive. |
+
+There is a CLAUDE-Code-style rule worth naming here: three similar lines is better than a premature abstraction. The Rust ML ecosystem in 2026 doesn't yet have the second CLIP-based metric in Burn. When it lands, the refactor extracts a `ClipViTBackbone` module that both A-FINE and the new metric depend on. Until then, the inlined CLIP-ViT lives entirely inside the `afine/` subfolder and the cost of having it there is zero.
+
+## The PR, broken down
+
+The 1,864 lines split across ten files. Two of them are tiny modifications to existing files (the module-tree registration in `crates/burn-train/src/metric/vision/mod.rs`, and a one-line addition to the Burn Book's metrics index). The other eight are new files, all under `crates/burn-train/src/metric/vision/afine/`:
+
+<FileLocBars
+  files={[
+    { path: "afine/heads.rs", loc: 383, role: "fidelity head + naturalness head" },
+    { path: "afine/clip_vit.rs", loc: 367, role: "inlined CLIP Vision Transformer" },
+    { path: "afine/metric.rs", loc: 370, role: "top-level metric + adapter blend" },
+    { path: "afine/weights.rs", loc: 264, role: "PyTorch weight loader (burn-store)" },
+    { path: "afine/calibrators.rs", loc: 250, role: "5-parameter logistic calibrator" },
+    { path: "afine/clip_attention.rs", loc: 137, role: "multi-head attention block" },
+    { path: "afine/quick_gelu.rs", loc: 71, role: "QuickGELU activation function" },
+    { path: "afine/mod.rs", loc: 19, role: "module entry + public exports" },
+  ]}
+/>
+
+The shape of those numbers tells the story of where the work went. About 940 lines (`clip_vit.rs` + `clip_attention.rs` + `quick_gelu.rs`) are the CLIP Vision Transformer reimplementation. About 750 lines (`heads.rs` + `calibrators.rs`) are the A-FINE-specific assessment machinery. About 370 lines is the top-level `metric.rs` that wires the pieces together and implements the adaptive blend. About 264 lines is the PyTorch weight loader. The remaining 19 lines is the module skeleton.
+
+## The forward pass, walked
+
+Here is what happens when you call `A-Fine::forward(distorted, reference)` on the merged code. The stages below are clickable — pick any one to see what it does and what the tensor shape looks like at that point.
+
+<PipelineWalker
+  stages={[
+    {
+      id: "input",
+      label: "input",
+      shape: "[2, 3, 224, 224]",
+      detail: "Two images (distorted and reference) stacked into one batch. RGB, resized to 224×224. The doubling means every downstream operation processes both images in one shot, which is faster than two separate forward passes.",
+    },
+    {
+      id: "patch",
+      label: "patch embed",
+      shape: "[2, 196, 768]",
+      detail: "Each 224×224 image gets split into a 14×14 grid of 16×16 patches. Each patch is linearly projected to a 768-dimensional embedding. The class token is prepended, giving 197 sequence positions — but the class token is only used by the naturalness head later, so think of this as 196 patch embeddings for now.",
+    },
+    {
+      id: "pos",
+      label: "pos embed",
+      shape: "[2, 197, 768]",
+      detail: "Positional embeddings are added so the transformer knows which patch came from which part of the image. CLIP's variant is a learned absolute positional embedding (not sinusoidal). The class token gets its own slot at index 0.",
+    },
+    {
+      id: "vit",
+      label: "CLIP ViT",
+      shape: "[2, 197, 768]",
+      detail: "Twelve transformer blocks (multi-head self-attention + MLP, both with residual connections and LayerNorm). This is where the CLIP-specific bits matter: QuickGELU instead of standard GELU in the MLPs, layer-norm placement at pre-norm not post-norm, and fused-QKV projection rather than three separate Q/K/V Linear layers.",
+    },
+    {
+      id: "fidelity",
+      label: "fidelity",
+      shape: "[1]",
+      detail: "Take the patch features from both images and compute an SSIM-style ratio in CLIP feature space. The output is a single scalar saying how similar the two images are in features the CLIP encoder cares about. This catches semantic-level mismatches that PSNR can't.",
+    },
+    {
+      id: "naturalness",
+      label: "naturalness",
+      shape: "[2]",
+      detail: "Take the class-token features from both images and run them through a small MLP head that predicts naturalness independently for each image. Output is two scalars: one for the distorted image, one for the reference image.",
+    },
+    {
+      id: "calibrator",
+      label: "calibrator",
+      shape: "[1] + [2]",
+      detail: "A 5-parameter logistic function — sigmoidal — applied to the fidelity score to put it on the same calibration scale as the naturalness scores. The parameters are trained on the IQA dataset and shipped with the weights.",
+    },
+    {
+      id: "adapter",
+      label: "adapter",
+      shape: "[1]",
+      detail: "Blend the calibrated fidelity score with the two naturalness scores. The blend is asymmetric: when the reference naturalness is high, fidelity carries the score; when the reference naturalness is low, distorted-image naturalness carries more weight. The output is a single A-FINE score.",
+    },
+  ]}
+/>
+
+The four boxes that make A-FINE genuinely *A-FINE* — as opposed to "another CLIP-based metric" — are `fidelity`, `naturalness`, `calibrator`, and `adapter`. The CLIP ViT is the substrate; those four are the model. The next few sections take each in turn.
+
+## The fidelity formula
+
+The fidelity head computes an SSIM-style ratio, but in CLIP feature space rather than pixel space. The intuition is the same as SSIM's: a good similarity measure considers means, variances, and covariance jointly so that constant offsets and pure-magnitude changes don't dominate. The formula is roughly:
+
+```
+                 (2 · μ_d · μ_r + c1) · (2 · σ_dr + c2)
+  fidelity = ───────────────────────────────────────────
+              (μ_d² + μ_r² + c1) · (σ_d² + σ_r² + c2)
+```
+
+Where `μ_d` and `μ_r` are the per-channel means of the distorted and reference patch features, `σ_d²` and `σ_r²` are the variances, `σ_dr` is the covariance, and `c1`, `c2` are small stabilising constants that prevent the ratio from blowing up when the denominators get close to zero.
+
+Those stabilising constants are where things get subtle. The paper sets `c1 = c2 = 1e-10`. They look like a numerical hack — and they basically are — but their *size* matters enormously, because they live in the same magnitude region as the actual feature statistics. CLIP-feature means are typically O(0.01–0.1); if you set `c` too large, you swamp the real signal and the ratio collapses toward 1 for every input pair. If you set `c` too small, you risk overflow or division by zero on rare inputs.
+
+The widget below sweeps `c` over twelve orders of magnitude. Watch what happens to the response curve as the constant grows.
+
+<RatioCollapse />
+
+When `c` is at the paper's value of `1e-10` the curve has meaningful variation across the input range. By the time `c` reaches `1e-6` the curve is starting to flatten. By `1e-3` it has collapsed entirely — every input pair gets the same fidelity score. This is what "silent failure mode" looks like: no crash, no warning, no obviously-wrong output. Just a metric that has lost the ability to discriminate, and a downstream caller who has no idea anything is wrong.
+
+This trap bit me once during implementation. I had typed `1e-6` instead of `1e-10` while transcribing the formula, the e2e parity test against the PyIQA reference still passed at low decimal places, and I only caught it when I ran a wider regression sweep across multiple distortion types. The lesson stuck.
+
+## The adapter — where "adaptive" actually lives
+
+The fidelity head and the two naturalness heads each produce a score. The adapter is what blends those three numbers into the final A-FINE output. The blend is parameterised by the two naturalness scores themselves — that is the trick.
+
+Intuitively: if the reference image looks high-quality (high `s_nat_r`), trust the fidelity score. If the reference looks low-quality, the fidelity-to-reference signal is itself unreliable; put more weight on how natural the *distorted* image looks on its own.
+
+The widget below draws the score surface as a function of `s_nat_d` and `s_nat_r`, holding the raw fidelity score `s_fid` fixed at a slider-controlled value. Hover or click cells to compare the score at `(s_nat_d, s_nat_r)` against its mirror at `(s_nat_r, s_nat_d)` — the swap-twin. If those two scores were always identical, the metric would be symmetric and we'd be back to a standard FR-IQA metric. The interesting region is where they differ.
+
+<AdapterHeatmap />
+
+Drag the `s_fid` slider down to 0.2 (fidelity is bad). Look at the cursor versus its swap-twin. The asymmetry Δ at the bottom of the panel tells you how much swapping reference and distorted would change the final score. When it's near zero, fidelity is doing the work and the metric is effectively symmetric. When Δ is meaningfully positive or negative — and it gets large in the corners where one image is much more natural than the other — that gap is precisely where A-FINE's "adaptive" mechanism is firing.
+
+The actual blend function in the paper is a small learned network with a handful of parameters, trained jointly with the calibrator on the IQA datasets. My mock above approximates the shape; the real version has tighter calibration and slightly different curvature, but the asymmetry pattern is the same.
+
+## The CLIP ViT inlining
+
+About half the PR's lines are the CLIP Vision Transformer reimplementation. The reason this is half the PR and not a one-line `use clip_vit::*` is that the Rust ML ecosystem in 2026 does not have a stock CLIP-ViT module that Burn can pull from. We have a choice: depend on an external Rust crate (typically less-maintained, with weight-format mismatches), use Burn's general-purpose transformer module (would need to be heavily parameterised to match CLIP's exact specification), or inline a CLIP-specific implementation.
+
+Inlining won — for the precedent reasons (LPIPS, DISTS, FID all inlined) and because it lets the PR be self-contained for review.
+
+The inlined ViT lives across three files:
+
+- `clip_vit.rs` is the top-level: patch embedding, positional embedding, class token, the stack of twelve transformer blocks, and the final layer-norm.
+- `clip_attention.rs` is one transformer block: pre-norm, fused-QKV multi-head self-attention, MLP with QuickGELU.
+- `quick_gelu.rs` is the QuickGELU activation function on its own.
+
+Here's a sketch of the block in Rust:
+
+```rust
+// crates/burn-train/src/metric/vision/afine/clip_attention.rs (excerpt)
+
+#[derive(Module, Debug)]
+pub struct ClipBlock<B: Backend> {
+    norm1: LayerNorm<B>,
+    attn: MultiHeadAttention<B>,
+    norm2: LayerNorm<B>,
+    mlp_fc1: Linear<B>,
+    mlp_act: QuickGelu,
+    mlp_fc2: Linear<B>,
+}
+
+impl<B: Backend> ClipBlock<B> {
+    pub fn forward(&self, x: Tensor<B, 3>) -> Tensor<B, 3> {
+        // Pre-norm transformer block (CLIP's choice, not BERT's).
+        let attn_out = self.attn.forward(self.norm1.forward(x.clone()));
+        let x = x + attn_out;
+        let mlp_in = self.norm2.forward(x.clone());
+        let mlp_out = self.mlp_fc2.forward(
+            self.mlp_act.forward(self.mlp_fc1.forward(mlp_in))
+        );
+        x + mlp_out
+    }
+}
+```
+
+The pre-norm placement matters. Some transformers — BERT and the original Vaswani paper — normalise *after* the residual addition. CLIP normalises before. If you get this backwards you'll produce numbers that look plausible but disagree with the reference implementation at every depth.
+
+## The implementation traps
+
+The four interesting bugs I hit while porting the metric.
+
+### Trap 1 — QuickGELU is not GELU
+
+CLIP uses an activation function called QuickGELU, not the standard GELU you'd find in most other transformers. The two are almost the same but not quite.
+
+Standard GELU is defined as `x · Φ(x)` where Φ is the cumulative normal distribution function — implemented in practice via the error function. QuickGELU is `x · σ(1.702 · x)` where σ is the standard sigmoid. The numerical difference is small but real: the peak gap is around 0.014 (about 1.5 % of the function's range), and it lives in the middle of the curve where most activations actually sit.
+
+<GeluComparison />
+
+If you substitute standard GELU for QuickGELU in a CLIP ViT and run a parity test against the reference PyTorch implementation, your outputs will agree to about three decimal places — which looks like a successful port until you start looking at fourth-decimal precision and realise the error is growing slowly with depth. The model "works" but it doesn't *match*. The fix is to implement QuickGELU specifically (it's a one-line function) and use it. That is what `quick_gelu.rs` exists to do.
+
+### Trap 2 — fused-QKV transposed split
+
+The standard transformer textbook has three separate Linear layers for Q, K, and V. CLIP fuses them into a single Linear that projects to 3 × `embed_dim`, then splits the result into the three projections. The fused form is more efficient but introduces a transposition trap.
+
+If the fused projection produces a tensor of shape `[batch, seq, 3 · embed]`, you have two ways to split it back into Q, K, V:
+
+1. **Reshape then split along the head axis:** `view([batch, seq, 3, embed]) → split(dim=2)`. Each of Q, K, V is `[batch, seq, embed]`. The mental model: the channels for Q come first, then K, then V, all interleaved per-head.
+2. **Split along the channel axis directly:** `split(3 · embed, dim=-1)`. Each of Q, K, V is `[batch, seq, embed]`. The mental model: the channels are sectioned into three contiguous blocks — first the Q block, then K, then V.
+
+Both produce tensors of the right shape, but they give different *values* unless your fused Linear was specifically trained for one layout. CLIP's PyTorch implementation uses approach (1). I initially implemented approach (2) in Rust and got an output that was numerically wrong but type-correct at every layer of the network. The parity test caught it, but only because I'd seeded the parity test with weights from the reference checkpoint — without that, I'd have shipped a metric that "worked" with random weights and silently disagreed with the paper.
+
+The fix: match CLIP's split convention exactly. The comment on the affected lines now reads `// QKV split must match CLIP's interleaved-per-head layout; do not change to channel-axis split`.
+
+### Trap 3 — 0-D scalar drop
+
+This one was less subtle but more annoying. The naturalness head produces a single scalar per image. In `burn`, a single scalar is a `Tensor<B, 0>` — zero-dimensional. When you stack the two image scores together to feed the adapter, you `cat` them along a new axis 0.
+
+`cat` on `Tensor<B, 0>` is a no-op in some backends — it produces `Tensor<B, 0>` still, because there's no axis to grow. The fix is to `unsqueeze(0)` each scalar to `Tensor<B, 1>` first, then `cat` along axis 0 to produce `Tensor<B, 1>` of length 2. The trap is that this fails silently: the type system accepts the no-op `cat` and the downstream code happens to broadcast in a way that produces a number, just not the right number.
+
+Caught by the parity test. Fixed by always materialising scalars to 1-D before stacking. The pattern now appears in three places across the heads/adapter code.
+
+### Trap 4 — preprocessing inconsistency
+
+The CLIP image preprocessing is bicubic resize to 224×224 followed by per-channel mean-and-std normalisation using CLIP's specific constants (not ImageNet's). The PyIQA reference uses bilinear resize. The difference is tiny — a fraction of a percent in pixel values — but it shifts the metric's output enough to fail strict parity tests.
+
+I initially copied PyIQA's bilinear preprocessing. The fix was to match CLIP's bicubic preprocessing instead, which is what the original A-FINE paper trained against. The PyIQA reference is itself slightly inconsistent with the paper here, which is why the comment in the relevant Rust code says `// match CLIP, not PyIQA — PyIQA's bilinear resize diverges from training-time preprocessing by ~0.3%`.
+
+## The PyTorch weight loader
+
+The A-FINE checkpoint ships as a PyTorch `.pth` file. Loading it into Burn means walking the PyTorch tensor dictionary and assigning each tensor to the correct Burn module field — a key-by-key translation across naming conventions.
+
+`burn-store` is Burn's PyTorch-compatibility crate. It can read `.pth` and `.pt` files into a dictionary of `(key, tensor)` pairs. The work the A-FINE loader does is the *mapping*: PyTorch keys like `backbone.transformer.resblocks.0.attn.in_proj_weight` need to land in Burn's `clip_vit.blocks[0].attn.qkv.weight`.
+
+The mapping is mostly mechanical, but a few of the keys required attention:
+
+| PyTorch key pattern | Notes |
+|---|---|
+| `attn.in_proj_weight` / `in_proj_bias` | Fused QKV. Single tensor; the loader keeps it fused on the Burn side too, matching the inlined CLIP block. |
+| `ln_1` / `ln_2` | LayerNorm names; PyIQA uses `norm1` / `norm2`. The loader handles both via a key-rename pass. |
+| `mlp.c_fc` / `mlp.c_proj` | The two MLP Linear layers. CLIP's naming. The loader maps them to `mlp_fc1` and `mlp_fc2`. |
+| `class_embedding` | A single 768-dim vector. Loaded into the class-token parameter. |
+| `positional_embedding` | Shape `[197, 768]`. Loaded directly into the positional-embedding parameter. |
+| Calibrator scalars | Five floats: β₁ through β₅ for the logistic. Stored in the same checkpoint, under a different prefix (`calibrator.*`). |
+| Adapter scalars | A handful of weights for the adaptive blend. Same prefix pattern. |
+
+About 200 of `weights.rs`'s 264 lines are the explicit key-to-key mapping. The other 60 lines handle the wrapping (loading the `.pth` file, walking the dictionary, returning a fully-populated `A-Fine` module).
+
+It is the kind of code that nobody enjoys writing — long, mostly-mechanical, error-prone in subtle ways — and the kind that is genuinely valuable once it exists, because every future user of A-FINE-on-Burn loads weights with one function call rather than re-implementing the mapping.
+
+## The review
+
+The PR opened on 2026-04-28. It sat for a week — `laggui` posted on 2026-05-05 acknowledging it was on his stack but bigger PRs require context-switching time. On 2026-05-06 the actual review landed.
+
+<MaintainerQuote handle="laggui" role="tracel-ai/burn maintainer" date="2026-05-06">
+  Pretty clean implementation! Just one minor comment but otherwise LGTM.
+</MaintainerQuote>
+
+The one comment: the existing `forward_with_features` method returned the CLIP features and the class token as a tuple. `laggui` asked for a typed struct instead — `ClipOutput { features: Tensor<B, 3>, cls: Option<Tensor<B, 2>> }` — so that future CLIP-based metrics could pattern-match on it cleanly. Wrap the tuple in a struct, give the fields names, ship.
+
+I pushed the refactor on the morning of 2026-05-07. By the afternoon, `laggui` approved.
+
+<MaintainerQuote handle="laggui" role="tracel-ai/burn maintainer" date="2026-05-07">
+  LGTM! Your response time was totally fine btw 😄
+</MaintainerQuote>
+
+The "your response time was totally fine btw" is doing a lot of work. He's calling out that the gap between his review comment and my refactor — about 26 hours — was inside the window he considered reasonable. The reason that mattered: I had apologised for the delay when I pushed the refactor (the message reads "*hey, I made the changes you requested, took some time so sorry for that; does this look right now?*"). His reply was reassuring me that the apology wasn't necessary. That's a maintainer culture signal worth remembering.
+
+Four days later the PR merged.
+
+### One honest detail: the codecov gap
+
+The PR's patch coverage was 76.18 %. The project target is 80 %.
+
+<CoverageGauge
+  patchPct={76.18}
+  targetPct={80}
+  note="Codecov flagged the gap. The maintainer accepted the trade-off — the under-tested code is the PyTorch weight loader, which is structurally hard to unit-test without shipping a large checkpoint fixture. End-to-end parity tests cover it instead."
+/>
+
+It is worth being honest about this. A perfect engineering writeup would say "merged with full coverage and clean CI". The reality is that the codecov check failed and the PR merged anyway. Why?
+
+The under-tested code is concentrated in `weights.rs` — specifically the long key-to-key mapping that walks the PyTorch dictionary. Unit-testing each branch of that mapping would require either (a) shipping a fixture `.pth` file of meaningful size with the repo, or (b) constructing synthetic PyTorch dictionaries with the right key shapes inside the test, which is most of the way to re-implementing the loader inside the test. Neither was the right call. The end-to-end parity test (does the loaded module produce the same scores as PyIQA's reference Python implementation, given the same checkpoint?) covers `weights.rs` functionally — it just doesn't generate line-coverage credit because the parity test is an integration test, not a unit test.
+
+`laggui` accepted the trade-off without asking for it to be addressed. The PR merged with the codecov warning visible on the page. That is what an honest engineering writeup looks like: the metric got built, the metric got merged, and one of the boxes was not ticked because ticking it wasn't worth what it would have cost.
+
+## What A-FINE doesn't do
+
+For completeness, the limits.
+
+| Concern | A-FINE's behaviour |
+|---|---|
+| Geometric distortion (rotation, perspective) | Not explicitly modelled. Mild rotations and shifts are handled by the CLIP ViT's inherent translation-ish invariance, but large geometric transformations will collapse the fidelity score. |
+| Saliency | Treats all parts of the image as equally important. A face being slightly off in an otherwise-good image won't get extra weight relative to background detail. |
+| Temporal consistency | Single-image metric. Says nothing about how a video's frames relate. |
+| Adversarial robustness | Not designed for. Inputs crafted to fool the CLIP backbone will fool A-FINE. |
+| Out-of-distribution images | Trained on natural photo distributions. Diagrams, line art, paintings, screenshots all sit outside the training manifold and A-FINE's scores on them are less calibrated. |
+| Distributional comparison | Per-pair metric. Doesn't compare distributions of images the way FID does. |
+
+A-FINE's pitch isn't that it's the universal IQA metric. Its pitch is that for the family of full-reference IQA tasks where the reference image isn't perfect, it does meaningfully better than older metrics. That is a narrow but useful claim and the metric backs it up on the paper's benchmarks.
+
+## What this is part of
+
+A-FINE is one piece of a multi-PR engagement with `tracel-ai/burn`. Three other threads are open or queued at the time of writing:
+
+| PR / issue | Status | What it does |
+|---|---|---|
+| [#4519 — fold4d / Col2Im](https://github.com/tracel-ai/burn/issues/4519) | Informally claimed, queued | Adds the inverse of the existing `unfold4d` operator to Burn's ONNX surface. ONNX standard op, ~460 LOC. |
+| [#4938 — TensorContainer downcast fix](https://github.com/tracel-ai/burn/pull/4938) | Open as draft | Fixes a panic that bit two separate reporters eight months apart. PR body explicitly asks the maintainer to choose between two implementation directions before going non-draft. |
+| [#4716 — PytorchStore non-contiguous layer index](https://github.com/tracel-ai/burn/issues/4716) | Queued | Bug in `burn-store` — the same surface A-FINE's weight loader uses. Zero-ramp follow-on for whoever picks it up. |
+
+The pattern across these — and across the broader open-source-contributions work — is that each engagement starts by reading the repository's culture before writing any code. There is a private umbrella repo (`Capataina/OpenSourceContributions`) where the per-repo notes live: maintainer voices, contributor norms, PR templates, precedent-PR analyses. Every Burn engagement starts at `Notes/burn/` and the repo culture file. The cost is one half-day of reading per new repo; the payoff is PRs that match the project's house style on the first try.
+
+A-FINE merged in 9 days from PR open. That is not because the implementation was easy — it took two months from claim to PR — but because by the time the PR landed it already looked like a Burn PR.
+
+## What I'd tell another contributor
+
+The five lessons that generalise outside this specific PR:
+
+1. **Read your precedents before you read the paper.** The four merged perceptual-metric PRs in Burn taught me more about how to ship A-FINE into Burn than the A-FINE paper itself did. The paper tells you what the metric is; the precedents tell you what the codebase wants from your PR.
+2. **Long silences are survivable; technical depth at the comeback message is what survives them.** A 25-day silence on a claim looks bad. A 25-day silence followed by a precise message asking the right architectural questions looks like due diligence. The shape of the comeback message is the load-bearing piece.
+3. **Maintainer-as-collaborator, not maintainer-as-gatekeeper.** `laggui` corrected my struct shape, said *"your response time was totally fine btw"* when I apologised unnecessarily, and merged a PR with 76.18 % patch coverage because the trade-off made sense. Treating the review as a conversation rather than an audit makes the conversation easier.
+4. **One concern per PR — even if bundling feels efficient.** A-FINE shipped as one PR because that matched the precedent and because the inlined-backbone-plus-metric is one concern under the right framing. The next contribution (TensorContainer panic fix) is a strictly different concern and ships as a separate PR even though both touch Burn's gradients code.
+5. **Inline, don't depend, when the dependency would be a single-user crate.** The CLIP ViT inside `afine/` is private to A-FINE today. When a second CLIP-based metric lands in Burn, the refactor extracts it. Until then, inlining is the right shape — the alternative would have been an external Rust CLIP crate that nobody else uses and whose maintenance burden falls on this PR.
+
+The work is the point. The merged PR is a deliverable. Doing the work in a way that survives review, matches the project's house style, and leaves the codebase in a better shape than it found is the actual goal.
+
+---
+
+*A-FINE for Burn is part of a broader [open-source engagement program](https://github.com/Capataina/OpenSourceContributions) across the Rust ML ecosystem. The reference Python implementation by Chen, Wu, Ma, Zhang (CVPR 2025) lives at [ChrisDud0257/AFINE](https://github.com/ChrisDud0257/AFINE). The PR diff is [tracel-ai/burn#4894](https://github.com/tracel-ai/burn/pull/4894).*

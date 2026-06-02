@@ -1,6 +1,6 @@
 "use client";
 
-import type { Components } from "react-markdown";
+import type { MDXComponents } from "mdx/types";
 import { PrismAsyncLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 // Per-language grammar imports — registered with the highlighter below.
@@ -105,7 +105,7 @@ const CALLOUT_CONFIG: Record<string, CalloutConfig> = {
 };
 
 
-export const markdownComponents: Components = {
+export const markdownComponents: MDXComponents = {
   h1({ children, id }) {
     return (
       <h1

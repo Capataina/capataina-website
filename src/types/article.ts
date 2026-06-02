@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 /** Editorial format of an article. Drives the type chip in the list view
  *  and the type-filter toolbar. */
 export type ArticleType =
@@ -34,7 +36,7 @@ export interface Article {
   description: string;
   /** Optional free-form tags shown as chips on the list card. */
   tags?: string[];
-  /** Markdown body. Plain string; rendered through react-markdown +
-   *  remark-gfm. */
-  body: string;
+  /** The article body, compiled from an `.mdx` source. Articles import
+   *  their MDX module's default export and assign it here. */
+  body: ComponentType;
 }

@@ -5,16 +5,14 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import type { Article } from "@/types";
-import { MarkdownRenderer } from "./MarkdownRenderer";
 import { TableOfContents } from "./TableOfContents";
-import { extractHeadings } from "./extract-headings";
+import { extractHeadingsFromDom, type Heading } from "./extract-headings";
 
 interface ArticleViewProps {
   article: Article;
@@ -35,9 +33,8 @@ export const ArticleView = memo(function ArticleView({
   // re-runs its effect once the node is mounted.
   const [scrollRoot, setScrollRoot] = useState<HTMLElement | null>(null);
   const [isTocOpen, setIsTocOpen] = useState(true);
+  const [headings, setHeadings] = useState<Heading[]>([]);
   const articleRef = useRef<HTMLElement | null>(null);
-
-  const headings = useMemo(() => extractHeadings(article.body), [article.body]);
 
   // Reset scroll position whenever the article changes — switching from
   // one article to another shouldn't preserve the prior scroll offset.
@@ -59,6 +56,19 @@ export const ArticleView = memo(function ArticleView({
         String(i)
       );
     }
+  }, [article.slug]);
+
+  // Read the rendered heading elements out of the DOM so the TOC has
+  // something to anchor on. MDX bodies are compiled React trees with no
+  // raw markdown to parse — walking the rendered DOM is the right source
+  // of truth.
+  useLayoutEffect(() => {
+    const el = articleRef.current;
+    if (!el) {
+      setHeadings([]);
+      return;
+    }
+    setHeadings(extractHeadingsFromDom(el));
   }, [article.slug]);
 
   const toggleToc = useCallback(() => setIsTocOpen((open) => !open), []);
@@ -145,7 +155,7 @@ export const ArticleView = memo(function ArticleView({
             ref={articleRef}
             className="cascade-fade mx-auto max-w-[80ch]"
           >
-            <MarkdownRenderer body={article.body} />
+            <article.body />
           </article>
         </div>
       </div>
