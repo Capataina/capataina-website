@@ -120,7 +120,7 @@ pnpm analyze
 capataina-website/
 ├── CLAUDE.md                   # project-local Claude guidance (additive to ~/.claude/CLAUDE.md)
 ├── README.md                   # this file
-├── context/                    # implementation memory (architecture.md, notes.md, systems/)
+├── docs/                       # durable project plans and supporting documentation
 ├── public/
 │   ├── cv/Resume.pdf           # served at /cv/Resume.pdf — the Resume-button target
 │   └── fonts/Satoshi-Variable.woff2
@@ -312,16 +312,9 @@ pnpm build && pnpm start
 
 Or any static-file host can serve the `.next/standalone` output directly.
 
-## Implementation memory
+## Project documentation
 
-The `context/` folder holds the durable implementation memory:
-
-- **`context/architecture.md`** — top-down structural map: subsystem responsibilities, dependency direction, core execution + data flow, inter-system relationships, critical paths + blast radius, state ownership.
-- **`context/notes.md`** — design rationale, project preferences, conventions (memo wrap, useMemo for motion variants, Field cast at filter boundary), gotchas (`--accent-purple-*` indirection, pnpm 11 allowBuilds), deletion log, performance discipline summary.
-- **`context/systems/quadrant-interaction.md`** — deep dive on the central interaction subsystem: state machine, layout math, spring physics, accent CSS swap mechanism, hover-clip + label-sizing + dead-state + AccentColorContext deletion histories.
-- **`context/_staleness-report.md`** — snapshot from the last `upkeep-context` pass.
-
-Read these first when picking the project up after a break — they capture the *why* and the *what's intentional vs accidental*.
+Repository-wide direction and architecture live in this README. Operational constraints live in the recursive `AGENTS.md` files nearest the code they govern; the central quadrant interaction is owned by `src/app/AGENTS.md` and `src/components/shell/AGENTS.md`. Durable active work lives under `docs/plans/`.
 
 ## Acknowledgements
 

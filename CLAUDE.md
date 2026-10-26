@@ -89,9 +89,6 @@ swapped at runtime by `page.tsx` — they're the active accent the rest of
 the CSS reads from, not literally "purple". Don't rename them; the swap
 mechanism depends on the static name.
 
-## What lives in `context/`
+## Project-owned documentation
 
-`context/architecture.md` and `context/notes.md` are implementation memory
-captured by `upkeep-context` passes. Read these first when picking up the
-project after a break. They get refreshed when the structural shape changes
-(folder layout, theming model, content data shapes).
+At session start, read the repository-root `AGENTS.md`, `README.md`, and the nearest nested `AGENTS.md` for the area being changed. Durable active plans live under `docs/plans/`; implementation constraints belong in the nearest scoped `AGENTS.md`. Do not recreate a generated repository-memory layer.
